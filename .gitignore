@@ -1,0 +1,10 @@
+.idea/
+/web/node_modules
+/web/dist
+
+/server/log/
+/server/gva
+/server/latest_log
+
+/server/*.exe
+/server/*.exe~
