@@ -7,6 +7,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+// 初始化总路由
 func Routers() *gin.Engine {
 	Router := gin.Default()
 
@@ -29,6 +30,11 @@ func Routers() *gin.Engine {
 	// Router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 	// global.GVA_LOG.Info("register swagger handler")
 	// 方便统一添加路由组前缀 多服务器上线使用
+
+	// 获取路由组实例
+	// systemRouter := router.RouterGroupApp.System
+
+	// PrivateGroup := Router.Group("")
 
 	global.GVA_LOG.Info("router register success")
 	return Router
