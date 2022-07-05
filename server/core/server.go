@@ -15,7 +15,7 @@ type server interface {
 }
 
 func RunWindowsServer() {
-	if global.GVA_CONFIG.System.UseMultipoint {
+	if global.GVA_CONFIG.System.UseMultipoint || global.GVA_CONFIG.System.UseRedis {
 		// 初始化redis服务
 		initialize.Redis()
 	}
@@ -25,8 +25,8 @@ func RunWindowsServer() {
 		system.LoadAll()
 	}
 
+	fmt.Println("server*******************************")
 	Router := initialize.Routers()
-
 	Router.Static("/form-generator", "./resource/page")
 
 	address := fmt.Sprintf(":%d", global.GVA_CONFIG.System.Addr)
@@ -40,7 +40,7 @@ func RunWindowsServer() {
 	github地址 github.com/wucenglou/wucms-gva/server
 	当前版本:V0.0.1
 	默认自动化文档地址:http://127.0.0.1%s/swagger/index.html
-	默认前端文件运行地址:http://127.0.0.1:8080
+	默认前端文件运行地址:http://127.0.0.1:8020
 `, address)
 	global.GVA_LOG.Error(s.ListenAndServe().Error())
 

@@ -1,12 +1,17 @@
 package system
 
 import (
+	"wucms-gva/server/global"
 	"wucms-gva/server/model/common/response"
 	"wucms-gva/server/model/system"
 	systemReq "wucms-gva/server/model/system/request"
+	systemRes "wucms-gva/server/model/system/response"
 	"wucms-gva/server/utils"
 
+	// "wucms-gva/service/system"
+
 	"github.com/gin-gonic/gin"
+	"go.uber.org/zap"
 )
 
 // systemReq "wucms-gva/server/model/system/request"
@@ -21,8 +26,43 @@ func (b *BaseApi) Login(c *gin.Context) {
 	}
 	if store.Verify(l.CaptchaId, l.Captcha, true) {
 		u := &system.SysUser{Username: l.Username, Password: l.Password}
-		if err, user := userService.Login(u); err != nil {
-
+		if user, err := userService.Login(u); err != nil {
+			global.GVA_LOG.Error("登录失败！用户名不存在或者密码错误！", zap.Error(err))
+			response.FailWithMessage("用户名不存在或者密码错误", c)
+		} else {
+			if user.Enable != 1 {
+				global.GVA_LOG.Error("登录失败！用户被禁止登录！")
+				response.FailWithMessage("用户被禁止登录", c)
+				return
+			}
+			// b.Token
 		}
+	} else {
+		response.FailWithMessage("验证码密码", c)
+	}
+}
+
+// 登录以后签发jwt
+func (b *BaseApi) TokenNext(c *gin.Context, user system.SysUser) {
+	j := &utils.JWT{SigningKey: []byte(global.GVA_CONFIG.JWT.SigningKey)} // 唯一签名
+	claims := j.CreateClaims(systemReq.BaseClaims{
+		UUID:        user.UUID,
+		ID:          user.ID,
+		NickName:    user.NickName,
+		Username:    user.Username,
+		AuthorityId: user.AuthorityId,
+	})
+	token, err := j.CreateToken(claims)
+	if err != nil {
+		global.GVA_LOG.Error("获取token失败!", zap.Error(err))
+		response.FailWithMessage("获取token失败", c)
+		return
+	}
+	if !global.GVA_CONFIG.System.UseMultipoint {
+		response.OkWithDetailed(systemRes.LoginResponse{
+			User:      user,
+			Token:     token,
+			ExpiresAt: claims.StandardClaims.ExpiresAt * 1000,
+		}, "登录成功", c)
 	}
 }

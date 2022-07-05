@@ -3,6 +3,7 @@ package initialize
 import (
 	"net/http"
 	"wucms-gva/server/global"
+	"wucms-gva/server/router"
 
 	"github.com/gin-gonic/gin"
 )
@@ -11,6 +12,7 @@ import (
 func Routers() *gin.Engine {
 	Router := gin.Default()
 
+	systemRouter := router.RouterGroupApp.System
 	// 如果想要不使用nginx代理前端网页，可以修改 web/.env.production 下的
 	// VUE_APP_BASE_API = /
 	// VUE_APP_BASE_PATH = http://localhost
@@ -31,10 +33,20 @@ func Routers() *gin.Engine {
 	// global.GVA_LOG.Info("register swagger handler")
 	// 方便统一添加路由组前缀 多服务器上线使用
 
-	// 获取路由组实例
-	// systemRouter := router.RouterGroupApp.System
+	PublicGroup := Router.Group("")
+	{
+		// 健康监测
+		PublicGroup.GET("/health", func(c *gin.Context) {
+			c.JSON(200, "ok")
+		})
+	}
+	{
+		systemRouter.InitBaseRouter(PublicGroup) // 注册基础功能路由 不做鉴权
+		systemRouter.InitInitRouter(PublicGroup) // 自动初始化相关
+	}
+	PrivateGroup := Router.Group("")
 
-	// PrivateGroup := Router.Group("")
+	InstallPlugin(PublicGroup, PrivateGroup) // 安装插件
 
 	global.GVA_LOG.Info("router register success")
 	return Router

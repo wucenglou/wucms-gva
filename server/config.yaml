@@ -7,24 +7,33 @@ aliyun-oss:
   base-path: yourBasePath
 autocode:
   transfer-restart: true
-  root: D:\phpstudy_pro\WWW\WS\go\gin-vue-admin-master
+  root: D:\phpstudy_pro\WWW\WS\go\gin-vue-admin
   server: /server
-  server-api: /api/v1/autocode
+  server-api: /api/v1/%s
+  server-plug: /plugin/%s
   server-initialize: /initialize
-  server-model: /model/autocode
-  server-request: /model/autocode/request/
-  server-router: /router/autocode
-  server-service: /service/autocode
+  server-model: /model/%s
+  server-request: /model/%s/request/
+  server-router: /router/%s
+  server-service: /service/%s
   web: /web/src
   web-api: /api
   web-form: /view
   web-table: /view
+aws-s3:
+  bucket: xxxxx-10005608
+  region: ap-shanghai
+  endpoint: ""
+  s3-force-path-style: false
+  disable-ssl: false
+  secret-id: xxxxxxxx
+  secret-key: xxxxxxxx
+  base-url: https://gin.vue.admin
+  path-prefix: github.com/flipped-aurora/gin-vue-admin/server
 captcha:
   key-long: 6
   img-width: 240
   img-height: 80
-casbin:
-  model-path: ./resource/rbac_model.conf
 cors:
   mode: whitelist
   whitelist:
@@ -71,12 +80,13 @@ hua-wei-obs:
   access-key: you-access-key
   secret-key: you-secret-key
 jwt:
-  signing-key: 2d1f9b1c-3880-4872-9dd0-8c5a7a37585c
+  signing-key: 45292836-fac3-432b-812a-36901c2b1d75
   expires-time: 604800
   buffer-time: 86400
   issuer: qmPlus
 local:
   path: uploads/file
+  store-path: uploads/file
 mysql:
   path: 127.0.0.1
   port: "3306"
@@ -84,9 +94,9 @@ mysql:
   db-name: gva
   username: gva
   password: "123456"
-  max-idle-conns: 0
-  max-open-conns: 0
-  log-mode: ""
+  max-idle-conns: 10
+  max-open-conns: 100
+  log-mode: error
   log-zap: false
 pgsql:
   path: ""
@@ -113,10 +123,11 @@ redis:
   password: ""
 system:
   env: public
-  addr: 8888
+  addr: 8820
   db-type: mysql
   oss-type: local
   use-multipoint: false
+  use-redis: false
   iplimit-count: 15000
   iplimit-time: 3600
 tencent-cos:
@@ -138,10 +149,11 @@ timer:
     interval: 168h
 zap:
   level: info
-  format: console
   prefix: '[github.com/flipped-aurora/gin-vue-admin/server]'
+  format: console
   director: log
-  showLine: false
   encode-level: LowercaseColorLevelEncoder
   stacktrace-key: stacktrace
+  max-age: 30
+  show-line: true
   log-in-console: true
