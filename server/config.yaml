@@ -123,7 +123,7 @@ redis:
   password: ""
 system:
   env: public
-  addr: 8820
+  addr: 8828
   db-type: mysql
   oss-type: local
   use-multipoint: false
