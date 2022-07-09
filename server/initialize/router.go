@@ -12,7 +12,6 @@ import (
 func Routers() *gin.Engine {
 	Router := gin.Default()
 
-	systemRouter := router.RouterGroupApp.System
 	// 如果想要不使用nginx代理前端网页，可以修改 web/.env.production 下的
 	// VUE_APP_BASE_API = /
 	// VUE_APP_BASE_PATH = http://localhost
@@ -32,7 +31,7 @@ func Routers() *gin.Engine {
 	// Router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 	// global.GVA_LOG.Info("register swagger handler")
 	// 方便统一添加路由组前缀 多服务器上线使用
-
+	systemRouter := router.RouterGroupApp.System
 	PublicGroup := Router.Group("")
 	{
 		// 健康监测
