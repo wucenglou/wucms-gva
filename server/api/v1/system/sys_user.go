@@ -35,7 +35,7 @@ func (b *BaseApi) Login(c *gin.Context) {
 				response.FailWithMessage("用户被禁止登录", c)
 				return
 			}
-			// b.Token
+			b.TokenNext(c, *user)
 		}
 	} else {
 		response.FailWithMessage("验证码密码", c)

@@ -3,6 +3,7 @@ package initialize
 import (
 	"net/http"
 	"wucms-gva/server/global"
+	"wucms-gva/server/middleware"
 	"wucms-gva/server/router"
 
 	"github.com/gin-gonic/gin"
@@ -44,6 +45,10 @@ func Routers() *gin.Engine {
 		systemRouter.InitInitRouter(PublicGroup) // 自动初始化相关
 	}
 	PrivateGroup := Router.Group("")
+	PrivateGroup.Use(middleware.JWTAuth())
+	{
+		systemRouter.InitMenuRouter(PrivateGroup) // 注册menu路由
+	}
 
 	InstallPlugin(PublicGroup, PrivateGroup) // 安装插件
 
