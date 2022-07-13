@@ -1,6 +1,7 @@
 package system
 
 import (
+	"fmt"
 	"wucms-gva/server/global"
 	"wucms-gva/server/model/common/response"
 	"wucms-gva/server/model/system"
@@ -64,5 +65,23 @@ func (b *BaseApi) TokenNext(c *gin.Context, user system.SysUser) {
 			Token:     token,
 			ExpiresAt: claims.StandardClaims.ExpiresAt * 1000,
 		}, "登录成功", c)
+	}
+}
+
+// @Tags SysUser
+// @Summary 获取用户信息
+// @Security ApiKeyAuth
+// @accept application/json
+// @Produce application/json
+// @Success 200 {object} response.Response{data=map[string]interface{},msg=string} "获取用户信息"
+// @Router /user/getUserInfo [get]
+func (b *BaseApi) GetUserInfo(c *gin.Context) {
+	fmt.Println("get---------")
+	uuid := utils.GetUserUuid(c)
+	if ReqUser, err := userService.GetUserInfo(uuid); err != nil {
+		global.GVA_LOG.Error("获取失败！", zap.Error(err))
+		response.FailWithMessage("获取失败", c)
+	} else {
+		response.OkWithDetailed(gin.H{"userInfo": ReqUser}, "获取成功", c)
 	}
 }
