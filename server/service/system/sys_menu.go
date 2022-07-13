@@ -1,6 +1,7 @@
 package system
 
 import (
+	"fmt"
 	"strconv"
 	"wucms-gva/server/global"
 	"wucms-gva/server/model/system"
@@ -18,8 +19,26 @@ var MenuServiceApp = new(MenuService)
 
 func (menuService *MenuService) GetMenuTree(authorityId uint) (menus []system.SysMenu, err error) {
 	menuTree, err := menuService.getMenuTreeMap(authorityId)
+	fmt.Println(menuTree)
 	menus = menuTree["0"]
+	for i := 0; i < len(menus); i++ {
+		err = menuService.getChildrenList(&menus[i], menuTree)
+	}
 	return menus, err
+}
+
+//@author: [piexlmax](https://github.com/piexlmax)
+//@function: getChildrenList
+//@description: 获取子菜单
+//@param: menu *model.SysMenu, treeMap map[string][]model.SysMenu
+//@return: err error
+
+func (menuService *MenuService) getChildrenList(menu *system.SysMenu, treeMap map[string][]system.SysMenu) (err error) {
+	menu.Children = treeMap[menu.MenuId]
+	for i := 0; i < len(menu.Children); i++ {
+		err = menuService.getChildrenList(&menu.Children[i], treeMap)
+	}
+	return err
 }
 
 //@author: [piexlmax](https://github.com/piexlmax)

@@ -10,7 +10,7 @@ type RouterGroup struct {
 	UserRouter
 	// CasbinRouter
 	// AutoCodeRouter
-	// AuthorityRouter
+	AuthorityRouter
 	// DictionaryRouter
 	// OperationRecordRouter
 	// DictionaryDetailRouter

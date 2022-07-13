@@ -74,11 +74,9 @@ func (userService *UserService) GetUserInfo(uuid uuid.UUID) (user system.SysUser
 	}
 
 	var MenuIds []string
-
 	for i := range SysAuthorityMenus {
 		MenuIds = append(MenuIds, SysAuthorityMenus[i].MenuId)
 	}
-
 	var am system.SysBaseMenu
 	ferr := global.GVA_DB.First(&am, "name = ? and id in (?)", reqUser.Authority.DefaultRouter, MenuIds).Error
 	if errors.Is(ferr, gorm.ErrRecordNotFound) {
