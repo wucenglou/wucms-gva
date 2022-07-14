@@ -1,16 +1,28 @@
 package system
 
 import (
+	"errors"
 	"wucms-gva/server/global"
 	"wucms-gva/server/model/common/request"
 	"wucms-gva/server/model/system"
+
+	"gorm.io/gorm"
 )
 
-// var ErrRoleExistence = error.New("存在相同角色id")
+var ErrRoleExistence = errors.New("存在相同角色id")
 
 type AuthorityService struct{}
 
 var AuthorityServiceApp = new(AuthorityService)
+
+func (authorityService *AuthorityService) CreateAuthority(auth system.SysAuthority) (authority system.SysAuthority, err error) {
+	var authorityBox system.SysAuthority
+	if !errors.Is(global.GVA_DB.Where("authority_id = ?", auth.AuthorityId).First(&authorityBox).Error, gorm.ErrRecordNotFound) {
+		return auth, ErrRoleExistence
+	}
+	err = global.GVA_DB.Create(&auth).Error
+	return auth, err
+}
 
 //@author: [piexlmax](https://github.com/piexlmax)
 //@function: GetAuthorityInfoList
@@ -31,6 +43,19 @@ func (authorityService *AuthorityService) GetAuthorityInfoList(info request.Page
 		}
 	}
 	return authority, total, err
+}
+
+//@author: [piexlmax](https://github.com/piexlmax)
+//@function: SetMenuAuthority
+//@description: 菜单与角色绑定
+//@param: auth *model.SysAuthority
+//@return: error
+
+func (authorityService *AuthorityService) SetMenuAuthority(auth *system.SysAuthority) error {
+	var s system.SysAuthority
+	global.GVA_DB.Preload("SysBaseMenus").First(&s, "authority_id = ?", auth.AuthorityId)
+	err := global.GVA_DB.Model(&s).Association("SysBaseMenus").Replace(&auth.SysBaseMenus)
+	return err
 }
 
 //@author: [piexlmax](https://github.com/piexlmax)

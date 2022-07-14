@@ -1,7 +1,6 @@
 package system
 
 import (
-	"fmt"
 	"strconv"
 	"wucms-gva/server/global"
 	"wucms-gva/server/model/system"
@@ -19,7 +18,7 @@ var MenuServiceApp = new(MenuService)
 
 func (menuService *MenuService) GetMenuTree(authorityId uint) (menus []system.SysMenu, err error) {
 	menuTree, err := menuService.getMenuTreeMap(authorityId)
-	fmt.Println(menuTree)
+	// fmt.Println(menuTree)
 	menus = menuTree["0"]
 	for i := 0; i < len(menus); i++ {
 		err = menuService.getChildrenList(&menus[i], menuTree)
@@ -95,4 +94,18 @@ func (menuService *MenuService) getMenuTreeMap(authorityId uint) (treeMap map[st
 		treeMap[v.ParentId] = append(treeMap[v.ParentId], v)
 	}
 	return treeMap, err
+}
+
+//@author: [piexlmax](https://github.com/piexlmax)
+//@function: AddMenuAuthority
+//@description: 为角色增加menu树
+//@param: menus []model.SysBaseMenu, authorityId string
+//@return: err error
+
+func (menuService *MenuService) AddMenuAuthority(menus []system.SysBaseMenu, authorityId uint) (err error) {
+	var auth system.SysAuthority
+	auth.AuthorityId = authorityId
+	auth.SysBaseMenus = menus
+	err = AuthorityServiceApp.SetMenuAuthority(&auth)
+	return err
 }

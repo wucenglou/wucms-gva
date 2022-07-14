@@ -3,7 +3,7 @@ package system
 type RouterGroup struct {
 	// ApiRouter
 	JwtRouter
-	// SysRouter
+	SysRouter
 	BaseRouter
 	InitRouter
 	MenuRouter
