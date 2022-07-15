@@ -1,6 +1,7 @@
 package initialize
 
 import (
+	"fmt"
 	"net/http"
 	"wucms-gva/server/global"
 	"wucms-gva/server/middleware"
@@ -12,7 +13,9 @@ import (
 // 初始化总路由
 func Routers() *gin.Engine {
 	Router := gin.Default()
-
+	Router.GET("/ping", func(ctx *gin.Context) {
+		ctx.String(200, "ping")
+	})
 	// 如果想要不使用nginx代理前端网页，可以修改 web/.env.production 下的
 	// VUE_APP_BASE_API = /
 	// VUE_APP_BASE_PATH = http://localhost
@@ -26,8 +29,8 @@ func Routers() *gin.Engine {
 	// Router.Use(middleware.LoadTls())  // 打开就能玩https了
 	global.GVA_LOG.Info("use middleware logger")
 	// 跨域，如需跨域可以打开下面的注释
-	// Router.Use(middleware.Cors()) // 直接放行全部跨域请求
-	//Router.Use(middleware.CorsByRules()) // 按照配置的规则放行跨域请求
+	Router.Use(middleware.Cors())        // 直接放行全部跨域请求
+	Router.Use(middleware.CorsByRules()) // 按照配置的规则放行跨域请求
 	global.GVA_LOG.Info("use middleware cors")
 	// Router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 	// global.GVA_LOG.Info("register swagger handler")
@@ -37,10 +40,16 @@ func Routers() *gin.Engine {
 	{
 		// 健康监测
 		PublicGroup.GET("/health", func(c *gin.Context) {
-			c.JSON(200, "ok")
+			fmt.Println(c)
+			c.JSON(200, "ok 111")
 		})
 	}
 	{
+		// 健康监测
+		PublicGroup.GET("/health2", func(c *gin.Context) {
+
+			c.JSON(200, "ok 222")
+		})
 		systemRouter.InitBaseRouter(PublicGroup) // 注册基础功能路由 不做鉴权
 		systemRouter.InitInitRouter(PublicGroup) // 自动初始化相关
 	}
@@ -48,6 +57,7 @@ func Routers() *gin.Engine {
 	PrivateGroup.Use(middleware.JWTAuth())
 	{
 		systemRouter.InitUserRouter(PrivateGroup)      // 注册用户路由
+		systemRouter.InitJwtRouter(PrivateGroup)       // jwt相关路由
 		systemRouter.InitMenuRouter(PrivateGroup)      // 注册menu路由
 		systemRouter.InitSystemRouter(PrivateGroup)    // system相关路由
 		systemRouter.InitAuthorityRouter(PrivateGroup) // 注册角色路由

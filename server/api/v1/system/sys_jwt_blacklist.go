@@ -1,6 +1,7 @@
 package system
 
 import (
+	"fmt"
 	"wucms-gva/server/global"
 	"wucms-gva/server/model/common/response"
 	"wucms-gva/server/model/system"
@@ -22,9 +23,11 @@ func (j *JwtApi) JsonInBlacklist(c *gin.Context) {
 	token := c.Request.Header.Get("x-token")
 	jwt := system.JwtBlacklist{Jwt: token}
 	if err := jwtService.JsonInBlacklist(jwt); err != nil {
+		fmt.Println("jwt作废失败!")
 		global.GVA_LOG.Error("jwt作废失败!", zap.Error(err))
 		response.FailWithMessage("jwt作废失败", c)
 	} else {
+		fmt.Println("jwt作废成功!")
 		response.OkWithMessage("jwt作废成功", c)
 	}
 }
