@@ -6,7 +6,6 @@ import (
 	"wucms-gva/server/global"
 	"wucms-gva/server/initialize"
 
-	"github.com/gin-gonic/gin"
 	"go.uber.org/zap"
 )
 
@@ -22,10 +21,10 @@ func main() {
 	initialize.DBList()
 	fmt.Println("4*******************************")
 
-	Router := gin.Default()
-	Router.GET("/ping2", func(ctx *gin.Context) {
-		ctx.String(200, "ping2")
-	})
+	// Router := gin.Default()
+	// Router.GET("/ping2", func(ctx *gin.Context) {
+	// 	ctx.String(200, "ping2")
+	// })
 
 	if global.GVA_DB != nil {
 		initialize.RegisterTables(global.GVA_DB) // 初始化表

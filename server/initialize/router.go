@@ -63,8 +63,8 @@ func Routers() *gin.Engine {
 		systemRouter.InitAuthorityRouter(PrivateGroup) // 注册角色路由
 	}
 
-	InstallPlugin(PublicGroup, PrivateGroup) // 安装插件
-
+	InstallPlugin(Router) // 安装插件
+	print("-------------------------------")
 	global.GVA_LOG.Info("router register success")
 	return Router
 }
