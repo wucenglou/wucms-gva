@@ -1,6 +1,9 @@
 .idea/
+
 /web/node_modules
 /web/dist
+/webArco/node_modules
+/webArco/dist
 
 /server/log/
 /server/gva

@@ -1,6 +1,7 @@
 package utils
 
 import (
+	"fmt"
 	"wucms-gva/server/global"
 	systemReq "wucms-gva/server/model/system/request"
 
@@ -48,16 +49,19 @@ func GetUserUuid(c *gin.Context) uuid.UUID {
 
 // GetUserAuthorityId 从Gin的Context中获取从jwt解析出来的用户角色id
 func GetUserAuthorityId(c *gin.Context) uint {
-	if claims, exists := c.Get("claims"); !exists {
-		if cl, err := GetClaims(c); err != nil {
-			return 0
-		} else {
-			return cl.AuthorityId
-		}
-	} else {
-		waitUse := claims.(*systemReq.CustomClaims)
-		return waitUse.AuthorityId
-	}
+	fmt.Println("===========")
+	fmt.Println(c.Get("claims"))
+	// if claims, exists := c.Get("claims"); !exists {
+	// 	if cl, err := GetClaims(c); err != nil {
+	// 		return 0
+	// 	} else {
+	// 		return cl.AuthorityId
+	// 	}
+	// } else {
+	// 	waitUse := claims.(*systemReq.CustomClaims)
+	// 	return waitUse.AuthorityId
+	// }
+	return 0
 }
 
 // GetUserInfo 从Gin的Context中获取从jwt解析出来的用户角色id

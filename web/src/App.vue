@@ -1,26 +1,27 @@
 <template>
-  <a-config-provider :locale="locale">
+  <div id="app">
     <router-view />
-    <global-setting />
-  </a-config-provider>
+  </div>
 </template>
 
-<script lang="ts" setup>
-  import { computed } from 'vue';
-  import enUS from '@arco-design/web-vue/es/locale/lang/en-us';
-  import zhCN from '@arco-design/web-vue/es/locale/lang/zh-cn';
-  import GlobalSetting from '@/components/global-setting/index.vue';
-  import useLocale from '@/hooks/locale';
-
-  const { currentLocale } = useLocale();
-  const locale = computed(() => {
-    switch (currentLocale.value) {
-      case 'zh-CN':
-        return zhCN;
-      case 'en-US':
-        return enUS;
-      default:
-        return enUS;
-    }
-  });
+<script>
+export default {
+  name: 'App'
+}
 </script>
+
+<style lang="scss">
+// 引入初始化样式
+@import '@/style/main.scss';
+@import '@/style/base.scss';
+@import '@/style/mobile.scss';
+#app {
+  background: #eee;
+  height: 100vh;
+  overflow: hidden;
+  font-weight: 400 !important;
+}
+.el-button{
+  font-weight: 400 !important;
+}
+</style>

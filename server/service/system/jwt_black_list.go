@@ -5,8 +5,6 @@ import (
 	"time"
 	"wucms-gva/server/global"
 	"wucms-gva/server/model/system"
-
-	"go.uber.org/zap"
 )
 
 type JwtService struct{}
@@ -65,13 +63,13 @@ func (jwtService *JwtService) SetRedisJWT(jwt string, userName string) (err erro
 }
 
 func LoadAll() {
-	var data []string
-	err := global.GVA_DB.Model(&system.JwtBlacklist{}).Select("jwt").Find(&data).Error
-	if err != nil {
-		global.GVA_LOG.Error("加载数据库jwt黑名单失败!", zap.Error(err))
-		return
-	}
-	for i := 0; i < len(data); i++ {
-		global.BlackCache.SetDefault(data[i], struct{}{})
-	} // jwt黑名单 加入 BlackCache 中
+	// var data []string
+	// err := global.GVA_DB.Model(&system.JwtBlacklist{}).Select("jwt").Find(&data).Error
+	// if err != nil {
+	// 	global.GVA_LOG.Error("加载数据库jwt黑名单失败!", zap.Error(err))
+	// 	return
+	// }
+	// for i := 0; i < len(data); i++ {
+	// 	global.BlackCache.SetDefault(data[i], struct{}{})
+	// } // jwt黑名单 加入 BlackCache 中
 }

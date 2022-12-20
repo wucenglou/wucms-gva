@@ -19,7 +19,7 @@ import (
 // systemRes "wucms-gva/server/model/system/response"
 
 func (b *BaseApi) Login(c *gin.Context) {
-	print("555555555555")
+	print("6666666666666666666666666666666")
 	var l systemReq.Login
 	_ = c.ShouldBindJSON(&l)
 	if err := utils.Verify(l, utils.LoginVerify); err != nil {
