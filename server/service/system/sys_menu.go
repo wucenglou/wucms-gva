@@ -40,6 +40,47 @@ func (menuService *MenuService) getChildrenList(menu *system.SysMenu, treeMap ma
 	return err
 }
 
+// @author: [piexlmax](https://github.com/piexlmax)
+// @function: GetInfoList
+// @description: 获取路由分页
+// @return: list interface{}, total int64,err error
+func (menuService *MenuService) GetInfoList() (list interface{}, total int64, err error) {
+	var menuList []system.SysBaseMenu
+	treeMap, err := menuService.getBaseMenuTreeMap()
+	menuList = treeMap["0"]
+	for i := 0; i < len(menuList); i++ {
+		err = menuService.getBaseChildrenList(&menuList[i], treeMap)
+	}
+	return menuList, total, err
+}
+
+// @author: [piexlmax](https://github.com/piexlmax)
+// @function: getBaseMenuTreeMap
+// @description: 获取路由总树map
+// @return: treeMap map[string][]system.SysBaseMenu, err error
+func (menuService *MenuService) getBaseMenuTreeMap() (treeMap map[string][]system.SysBaseMenu, err error) {
+	var allMenus []system.SysBaseMenu
+	treeMap = make(map[string][]system.SysBaseMenu)
+	err = global.GVA_DB.Order("sort").Preload("MenuBtn").Preload("Parameters").Find(&allMenus).Error
+	for _, v := range allMenus {
+		treeMap[v.ParentId] = append(treeMap[v.ParentId], v)
+	}
+	return treeMap, err
+}
+
+// @author: [piexlmax](https://github.com/piexlmax)
+// @function: getBaseChildrenList
+// @description: 获取菜单的子菜单
+// @param: menu *model.SysBaseMenu, treeMap map[string][]model.SysBaseMenu
+// @return: err error
+func (menuService *MenuService) getBaseChildrenList(menu *system.SysBaseMenu, treeMap map[string][]system.SysBaseMenu) (err error) {
+	menu.Children = treeMap[strconv.Itoa(int(menu.ID))]
+	for i := 0; i < len(menu.Children); i++ {
+		err = menuService.getBaseChildrenList(&menu.Children[i], treeMap)
+	}
+	return err
+}
+
 //@author: [piexlmax](https://github.com/piexlmax)
 //@function: getMenuTreeMap
 //@description: 获取路由总树map

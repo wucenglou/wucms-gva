@@ -14,6 +14,7 @@ func (s *UserRouter) InitUserRouter(Router *gin.RouterGroup) {
 	userRouterWithoutRecord := Router.Group("user")
 	baseApi := v1.ApiGroupApp.SystemApiGroup.BaseApi
 	{
+		userRouter.POST("admin_register", baseApi.Register)
 	}
 	{
 		userRouterWithoutRecord.GET("getUserInfo", baseApi.GetUserInfo) // 获取自身信息
