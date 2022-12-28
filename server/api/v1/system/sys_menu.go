@@ -15,7 +15,7 @@ import (
 type AuthorityMenuApi struct{}
 
 func (a *AuthorityMenuApi) GetMenu(c *gin.Context) {
-	print("------------+++++++++++++++++++")
+	print("---------getMenu------------")
 	print(utils.GetUserAuthorityId(c))
 	if menus, err := menuService.GetMenuTree(utils.GetUserAuthorityId(c)); err != nil {
 		global.GVA_LOG.Error("获取失败!", zap.Error(err))
@@ -50,5 +50,15 @@ func (a *AuthorityMenuApi) GetMenuList(c *gin.Context) {
 		return
 	}
 	menuList, total, err := menuService.GetInfoList()
-
+	if err != nil {
+		global.GVA_LOG.Error("获取失败！", zap.Error(err))
+		response.FailWithMessage("获取失败", c)
+		return
+	}
+	response.OkWithDetailed(response.PageResult{
+		List:     menuList,
+		Total:    total,
+		Page:     pageInfo.Page,
+		PageSize: pageInfo.PageSize,
+	}, "获取成功", c)
 }

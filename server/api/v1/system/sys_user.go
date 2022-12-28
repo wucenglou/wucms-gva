@@ -3,6 +3,7 @@ package system
 import (
 	"fmt"
 	"wucms-gva/server/global"
+	"wucms-gva/server/model/common/request"
 	"wucms-gva/server/model/common/response"
 	"wucms-gva/server/model/system"
 	systemReq "wucms-gva/server/model/system/request"
@@ -95,6 +96,40 @@ func (b *BaseApi) Register(c *gin.Context) {
 	// 	})
 	// }
 	// user := &system.SysUser{Username: r.Username, NickName: r.NickName, Password: r.Password, HeaderImg: r.HeaderImg,AuthorityId: r.AuthorityId, Authorities: authorities, Enable: r.Enable, Phone: r.Phone, Email: r.Email}
+}
+
+// GetUserList
+// @Tags      SysUser
+// @Summary   分页获取用户列表
+// @Security  ApiKeyAuth
+// @accept    application/json
+// @Produce   application/json
+// @Param     data  body      request.PageInfo                                        true  "页码, 每页大小"
+// @Success   200   {object}  response.Response{data=response.PageResult,msg=string}  "分页获取用户列表,返回包括列表,总数,页码,每页数量"
+// @Router    /user/getUserList [post]
+func (b *BaseApi) GetUserList(c *gin.Context) {
+	var pageInfo request.PageInfo
+	err := c.ShouldBindJSON(&pageInfo)
+	if err != nil {
+		response.FailWithMessage(err.Error(), c)
+		return
+	}
+	err = utils.Verify(pageInfo, utils.PageInfoVerify)
+	if err != nil {
+		response.FailWithMessage(err.Error(), c)
+	}
+	list, total, err := userService.GetUserInfoList(pageInfo)
+	if err != nil {
+		global.GVA_LOG.Error("获取失败！", zap.Error(err))
+		response.FailWithMessage("获取失败", c)
+		return
+	}
+	response.OkWithDetailed(response.PageResult{
+		List:     list,
+		Total:    total,
+		Page:     pageInfo.Page,
+		PageSize: pageInfo.PageSize,
+	}, "获取成功", c)
 }
 
 // @Tags SysUser

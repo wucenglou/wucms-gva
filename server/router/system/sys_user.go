@@ -17,6 +17,7 @@ func (s *UserRouter) InitUserRouter(Router *gin.RouterGroup) {
 		userRouter.POST("admin_register", baseApi.Register)
 	}
 	{
+		userRouterWithoutRecord.POST("getUserList", baseApi.GetUserList)
 		userRouterWithoutRecord.GET("getUserInfo", baseApi.GetUserInfo) // 获取自身信息
 	}
 }
