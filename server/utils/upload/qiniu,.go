@@ -46,3 +46,39 @@ func (*Qiniu) UploadFile(file *multipart.FileHeader) (string, string, error) {
 	}
 	return global.GVA_CONFIG.Qiniu.ImgPath + "/" + ret.key, ret.Key, nil
 }
+
+//@author: [piexlmax](https://github.com/piexlmax)
+//@author: [ccfish86](https://github.com/ccfish86)
+//@author: [SliverHorn](https://github.com/SliverHorn)
+//@object: *Qiniu
+//@function: DeleteFile
+//@description: 删除文件
+//@param: key string
+//@return: error
+
+func (*Qiniu) DeleteFile(key string) error {
+	// mac := qbox.NewMac(global.GVA_CONFIG)
+}
+
+// @author: [SliverHorn](https://github.com/SliverHorn)
+// @object: *Qiniu
+// @function: qiniuConfig
+// @description: 根据配置文件进行返回七牛云的配置
+// @return: *storage.Config
+func qiniuConfig() *storage.Config {
+	cfg := storage.Config{
+		UseHTTPS:      global.GVA_CONFIG.Qiniu.UseHTTPS,
+		UseCdnDomains: global.GVA_CONFIG.Qiniu.UseCdnDomains,
+	}
+	switch global.GVA_CONFIG.Qiniu.Zone { // 根据配置文件进行初始化空间对应的机房
+	case "ZoneHuadong":
+		cfg.Zone = &storage.ZoneHuadong
+	case "ZoneHuabei":
+		cfg.Zone = &storage.ZoneHuabei
+	case "ZoneHuanan":
+		cfg.Zone = &storage.ZoneHuanan
+	case "ZoneXinjiapo":
+		cfg.Zone = &storage.ZoneXinjiapo
+	}
+	return &cfg
+}
