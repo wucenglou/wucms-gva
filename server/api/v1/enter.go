@@ -7,6 +7,7 @@ import (
 
 type ApiGroup struct {
 	SystemApiGroup  system.ApiGroup
+	ExampleApiGroup example.ApiGroup
 }
 
 var ApiGroupApp = new(ApiGroup)
