@@ -85,6 +85,36 @@ func (userService *UserService) GetUserInfoList(info request.PageInfo) (list int
 	return userList, total, err
 }
 
+// @author: [piexlmax](https://github.com/piexlmax)
+// @function: SetUserAuthorities
+// @description: 设置一个用户的权限
+// @param: id uint, authorityIds []string
+// @return: err error
+func (userService *UserService) SetUserAuthorities(id uint, authorityIds []uint) (err error) {
+	return global.GVA_DB.Transaction(func(tx *gorm.DB) error {
+		TxErr := tx.Delete(&[]system.SysUserAuthority{}, "sys_user_id= ?", id).Error
+		if TxErr != nil {
+			return TxErr
+		}
+		var useAuthority []system.SysUserAuthority
+		for _, v := range authorityIds {
+			useAuthority = append(useAuthority, system.SysUserAuthority{
+				SysUserId: id, SysAuthorityAuthorityId: v,
+			})
+		}
+		TxErr = tx.Create(&useAuthority).Error
+		if TxErr != nil {
+			return TxErr
+		}
+		TxErr = tx.Where("id = ?", id).First(&system.SysUser{}).Update("authority_id", authorityIds[0]).Error
+		if TxErr != nil {
+			return TxErr
+		}
+		// 返回 nil 提交事务
+		return nil
+	})
+}
+
 //@author: [piexlmax](https://github.com/piexlmax)
 //@function: GetUserInfo
 //@description: 获取用户信息

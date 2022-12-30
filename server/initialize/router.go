@@ -13,6 +13,7 @@ import (
 // 初始化总路由
 func Routers() *gin.Engine {
 	Router := gin.Default()
+	exampleRouter := router.RouterGroupApp.Example
 	Router.GET("/ping", func(ctx *gin.Context) {
 		ctx.String(200, "ping")
 	})
@@ -61,6 +62,8 @@ func Routers() *gin.Engine {
 		systemRouter.InitMenuRouter(PrivateGroup)      // 注册menu路由
 		systemRouter.InitSystemRouter(PrivateGroup)    // system相关路由
 		systemRouter.InitAuthorityRouter(PrivateGroup) // 注册角色路由
+
+		exampleRouter.InitFileUploadAndDownloadRouter(PrivateGroup) // 文件上传下载功能路由
 	}
 
 	InstallPlugin(Router) // 安装插件

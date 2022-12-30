@@ -1,7 +1,6 @@
 package system
 
 import (
-	"fmt"
 	"wucms-gva/server/global"
 	"wucms-gva/server/model/common/request"
 	"wucms-gva/server/model/common/response"
@@ -78,24 +77,55 @@ func (b *BaseApi) TokenNext(c *gin.Context, user system.SysUser) {
 // @Success  200   {object}  response.Response{data=systemRes.SysUserResponse,msg=string}  "用户注册账号,返回包括用户信息"
 // @Router   /user/admin_register [post]
 func (b *BaseApi) Register(c *gin.Context) {
-	fmt.Println("9999999999999+++++++++")
-	// var r systemReq.Register
-	// err := c.ShouldBindJSON(&r)
-	// if err != nil {
-	// 	response.FailWithMessage(err.Error(), c)
-	// }
-	// err = utils.Verify(r, utils.RegisterVerify)
-	// if err != nil {
-	// 	response.FailWithMessage(err.Error(), c)
-	// 	return
-	// }
-	// var authorities []system.SysAuthority
-	// for _, v := range r.AuthorityIds {
-	// 	authorities = append(authorities, system.SysAuthority{
-	// 		AuthorityId: v,
-	// 	})
-	// }
-	// user := &system.SysUser{Username: r.Username, NickName: r.NickName, Password: r.Password, HeaderImg: r.HeaderImg,AuthorityId: r.AuthorityId, Authorities: authorities, Enable: r.Enable, Phone: r.Phone, Email: r.Email}
+	var r systemReq.Register
+	err := c.ShouldBindJSON(&r)
+	if err != nil {
+		response.FailWithMessage(err.Error(), c)
+	}
+	err = utils.Verify(r, utils.RegisterVerify)
+	if err != nil {
+		response.FailWithMessage(err.Error(), c)
+		return
+	}
+	var authorities []system.SysAuthority
+	for _, v := range r.AuthorityIds {
+		authorities = append(authorities, system.SysAuthority{
+			AuthorityId: v,
+		})
+	}
+	user := &system.SysUser{Username: r.Username, NickName: r.NickName, Password: r.Password, HeaderImg: r.HeaderImg, AuthorityId: r.AuthorityId, Authorities: authorities, Enable: r.Enable, Phone: r.Phone, Email: r.Email}
+	userReturn, err := userService.Register(*user)
+	if err != nil {
+		global.GVA_LOG.Error("注册失败！", zap.Error(err))
+		response.FailWithDetailed(systemRes.SysUserResponse{User: userReturn}, "注册失败", c)
+		return
+	}
+	response.OkWithDetailed(systemRes.SysUserResponse{User: userReturn}, "注册成功！", c)
+}
+
+// SetUserAuthorities
+// @Tags      SysUser
+// @Summary   设置用户权限
+// @Security  ApiKeyAuth
+// @accept    application/json
+// @Produce   application/json
+// @Param     data  body      systemReq.SetUserAuthorities   true  "用户UUID, 角色ID"
+// @Success   200   {object}  response.Response{msg=string}  "设置用户权限"
+// @Router    /user/setUserAuthorities [post]
+func (b *BaseApi) SetUserAuthorities(c *gin.Context) {
+	var sua systemReq.SetUserAuthorities
+	err := c.ShouldBindJSON(&sua)
+	if err != nil {
+		response.FailWithMessage(err.Error(), c)
+		return
+	}
+	err = userService.SetUserAuthorities(sua.ID, sua.AuthorityIds)
+	if err != nil {
+		global.GVA_LOG.Error("修改失败！", zap.Error(err))
+		response.FailWithMessage("修改失败", c)
+		return
+	}
+	response.OkWithMessage("修改成功", c)
 }
 
 // GetUserList
@@ -130,6 +160,19 @@ func (b *BaseApi) GetUserList(c *gin.Context) {
 		Page:     pageInfo.Page,
 		PageSize: pageInfo.PageSize,
 	}, "获取成功", c)
+}
+
+// SetUserInfo
+// @Tags      SysUser
+// @Summary   设置用户信息
+// @Security  ApiKeyAuth
+// @accept    application/json
+// @Produce   application/json
+// @Param     data  body      system.SysUser                                             true  "ID, 用户名, 昵称, 头像链接"
+// @Success   200   {object}  response.Response{data=map[string]interface{},msg=string}  "设置用户信息"
+// @Router    /user/setUserInfo [put]
+func (b *BaseApi) SetUserInfo(c *gin.Context) {
+
 }
 
 // @Tags SysUser

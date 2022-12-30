@@ -15,6 +15,7 @@ func (s *UserRouter) InitUserRouter(Router *gin.RouterGroup) {
 	baseApi := v1.ApiGroupApp.SystemApiGroup.BaseApi
 	{
 		userRouter.POST("admin_register", baseApi.Register)
+		userRouter.POST("setUserAuthorities", baseApi.SetUserAuthorities) // 设置用户权限组
 	}
 	{
 		userRouterWithoutRecord.POST("getUserList", baseApi.GetUserList)
