@@ -6,6 +6,7 @@ type ServiceGroup struct {
 	UserService
 	CasbinService
 	InitDBService
+	BaseMenuService
 	SystemConfigService
 	AuthorityService
 	OperationRecordService

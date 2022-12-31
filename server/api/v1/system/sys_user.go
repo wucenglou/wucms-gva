@@ -128,6 +128,37 @@ func (b *BaseApi) SetUserAuthorities(c *gin.Context) {
 	response.OkWithMessage("修改成功", c)
 }
 
+// ChangePassword
+// @Tags      SysUser
+// @Summary   用户修改密码
+// @Security  ApiKeyAuth
+// @Produce  application/json
+// @Param     data  body      systemReq.ChangePasswordReq    true  "用户名, 原密码, 新密码"
+// @Success   200   {object}  response.Response{msg=string}  "用户修改密码"
+// @Router    /user/changePassword [post]
+func (b *BaseApi) ChangePassword(c *gin.Context) {
+	var req systemReq.ChangePasswordReq
+	err := c.ShouldBindJSON(&req)
+	if err != nil {
+		response.FailWithMessage(err.Error(), c)
+		return
+	}
+	err = utils.Verify(req, utils.ChangePasswordVerify)
+	if err != nil {
+		response.FailWithMessage(err.Error(), c)
+		return
+	}
+	uid := utils.GetUserID(c)
+	u := &system.SysUser{GVA_MODEL: global.GVA_MODEL{ID: uid}, Password: req.Password}
+	_, err = userService.ChangePassword(u, req.NewPassword)
+	if err != nil {
+		global.GVA_LOG.Error("修改失败！", zap.Error(err))
+		response.FailWithMessage("修改失败,原密码与当前账户不符", c)
+		return
+	}
+	response.OkWithMessage("修改成功", c)
+}
+
 // GetUserList
 // @Tags      SysUser
 // @Summary   分页获取用户列表
@@ -162,6 +193,41 @@ func (b *BaseApi) GetUserList(c *gin.Context) {
 	}, "获取成功", c)
 }
 
+// DeleteUser
+// @Tags      SysUser
+// @Summary   删除用户
+// @Security  ApiKeyAuth
+// @accept    application/json
+// @Produce   application/json
+// @Param     data  body      request.GetById                true  "用户ID"
+// @Success   200   {object}  response.Response{msg=string}  "删除用户"
+// @Router    /user/deleteUser [delete]
+func (b *BaseApi) DeleteUser(c *gin.Context) {
+	var reqId request.GetById
+	err := c.ShouldBindJSON(&reqId)
+	if err != nil {
+		response.FailWithMessage(err.Error(), c)
+		return
+	}
+	err = utils.Verify(reqId, utils.IdVerify)
+	if err != nil {
+		response.FailWithMessage(err.Error(), c)
+		return
+	}
+	jwtId := utils.GetUserID(c)
+	if jwtId == uint(reqId.ID) {
+		response.FailWithMessage("删除失败,自删失败", c)
+		return
+	}
+	err = userService.DeleteUser(reqId.ID)
+	if err != nil {
+		global.GVA_LOG.Error("删除失败!", zap.Error(err))
+		response.FailWithMessage("删除失败", c)
+		return
+	}
+	response.OkWithMessage("删除成功", c)
+}
+
 // SetUserInfo
 // @Tags      SysUser
 // @Summary   设置用户信息
@@ -172,7 +238,42 @@ func (b *BaseApi) GetUserList(c *gin.Context) {
 // @Success   200   {object}  response.Response{data=map[string]interface{},msg=string}  "设置用户信息"
 // @Router    /user/setUserInfo [put]
 func (b *BaseApi) SetUserInfo(c *gin.Context) {
-
+	var user systemReq.ChangeUserInfo
+	err := c.ShouldBindJSON(&user)
+	if err != nil {
+		response.FailWithMessage(err.Error(), c)
+		return
+	}
+	err = utils.Verify(user, utils.IdVerify)
+	if err != nil {
+		response.FailWithMessage(err.Error(), c)
+		return
+	}
+	if len(user.AuthorityIds) != 0 {
+		err = userService.SetUserAuthorities(user.ID, user.AuthorityIds)
+		if err != nil {
+			global.GVA_LOG.Error("设置失败", zap.Error(err))
+			response.FailWithMessage("设置失败", c)
+			return
+		}
+	}
+	err = userService.SetUserInfo(system.SysUser{
+		GVA_MODEL: global.GVA_MODEL{
+			ID: user.ID,
+		},
+		NickName:  user.NickName,
+		HeaderImg: user.HeaderImg,
+		Phone:     user.Phone,
+		Email:     user.Email,
+		SideMode:  user.SideMode,
+		Enable:    user.Enable,
+	})
+	if err != nil {
+		global.GVA_LOG.Error("设置失败", zap.Error(err))
+		response.FailWithMessage("设置失败", c)
+		return
+	}
+	response.OkWithMessage("设置成功", c)
 }
 
 // @Tags SysUser
@@ -190,4 +291,28 @@ func (b *BaseApi) GetUserInfo(c *gin.Context) {
 	} else {
 		response.OkWithDetailed(gin.H{"userInfo": ReqUser}, "获取成功", c)
 	}
+}
+
+// ResetPassword
+// @Tags      SysUser
+// @Summary   重置用户密码
+// @Security  ApiKeyAuth
+// @Produce  application/json
+// @Param     data  body      system.SysUser                 true  "ID"
+// @Success   200   {object}  response.Response{msg=string}  "重置用户密码"
+// @Router    /user/resetPassword [post]
+func (b *BaseApi) ResetPassword(c *gin.Context) {
+	var user system.SysUser
+	err := c.ShouldBindJSON(&user)
+	if err != nil {
+		response.FailWithMessage(err.Error(), c)
+		return
+	}
+	err = userService.ResetPassword(user.ID)
+	if err != nil {
+		global.GVA_LOG.Error("重置失败！", zap.Error(err))
+		response.FailWithMessage("重置失败"+err.Error(), c)
+		return
+	}
+	response.OkWithMessage("重置成功", c)
 }

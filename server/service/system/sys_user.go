@@ -67,6 +67,25 @@ func (userService *UserService) Login(u *system.SysUser) (userInter *system.SysU
 	return &user, err
 }
 
+//@author: [piexlmax](https://github.com/piexlmax)
+//@function: ChangePassword
+//@description: 修改用户密码
+//@param: u *model.SysUser, newPassword string
+//@return: userInter *model.SysUser,err error
+
+func (userService *UserService) ChangePassword(u *system.SysUser, newPassword string) (userInter *system.SysUser, err error) {
+	var user system.SysUser
+	if err = global.GVA_DB.Where("id = ?", u.ID).First(&user).Error; err != nil {
+		return nil, err
+	}
+	if ok := utils.BcryptCheck(u.Password, user.Password); !ok {
+		return nil, errors.New("原密码错误")
+	}
+	user.Password = utils.BcryptHash(newPassword)
+	err = global.GVA_DB.Save(&user).Error
+	return &user, err
+}
+
 // @author: [piexlmax](https://github.com/piexlmax)
 // @function: GetUserInfoList
 // @description: 分页获取数据
@@ -116,6 +135,35 @@ func (userService *UserService) SetUserAuthorities(id uint, authorityIds []uint)
 }
 
 //@author: [piexlmax](https://github.com/piexlmax)
+//@function: DeleteUser
+//@description: 删除用户
+//@param: id float64
+//@return: err error
+
+func (userService *UserService) DeleteUser(id int) (err error) {
+	var user system.SysUser
+	err = global.GVA_DB.Where("id = ?", id).Delete(&user).Error
+	if err != nil {
+		return err
+	}
+	err = global.GVA_DB.Delete(&[]system.SysUserAuthority{}, "sys_user_id = ?", id).Error
+	return err
+}
+
+// SetUserInfo
+// @Tags      SysUser
+// @Summary   设置用户信息
+// @Security  ApiKeyAuth
+// @accept    application/json
+// @Produce   application/json
+// @Param     data  body      system.SysUser                                             true  "ID, 用户名, 昵称, 头像链接"
+// @Success   200   {object}  response.Response{data=map[string]interface{},msg=string}  "设置用户信息"
+// @Router    /user/setUserInfo [put]
+func (userService *UserService) SetUserInfo(req system.SysUser) error {
+	return global.GVA_DB.Updates(&req).Error
+}
+
+//@author: [piexlmax](https://github.com/piexlmax)
 //@function: GetUserInfo
 //@description: 获取用户信息
 //@param: uuid uuid.UUID
@@ -144,4 +192,14 @@ func (userService *UserService) GetUserInfo(uuid uuid.UUID) (user system.SysUser
 		reqUser.Authority.DefaultRouter = "404"
 	}
 	return reqUser, err
+}
+
+// @author: [piexlmax](https://github.com/piexlmax)
+// @function: resetPassword
+// @description: 修改用户密码
+// @param: ID uint
+// @return: err error
+func (userService *UserService) ResetPassword(ID uint) (err error) {
+	err = global.GVA_DB.Model(&system.SysUser{}).Where("id = ?", ID).Update("password", utils.BcryptHash("123456")).Error
+	return err
 }
