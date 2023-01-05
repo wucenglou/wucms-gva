@@ -17,8 +17,9 @@ func (s *MenuRouter) InitMenuRouter(Router *gin.RouterGroup) (R gin.IRoutes) {
 		menuRouter.POST("updateBaseMenu", authorityMenuApi.UpdateBaseMenu) // 更新菜单
 	}
 	{
-		menuRouterWithoutRecord.POST("getMenuList", authorityMenuApi.GetMenuList)
-		menuRouterWithoutRecord.POST("getMenu", authorityMenuApi.GetMenu)
+		menuRouterWithoutRecord.POST("getMenu", authorityMenuApi.GetMenu)                 // 获取菜单树
+		menuRouterWithoutRecord.POST("getMenuList", authorityMenuApi.GetMenuList)         // 分页获取基础menu列表
+		menuRouterWithoutRecord.POST("getBaseMenuTree", authorityMenuApi.GetBaseMenuTree) // 获取用户动态路由
 		menuRouterWithoutRecord.POST("getBaseMenuById", authorityMenuApi.GetBaseMenuById) // 根据id获取菜单
 	}
 	return menuRouter
