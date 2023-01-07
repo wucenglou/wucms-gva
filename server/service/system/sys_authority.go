@@ -25,6 +25,29 @@ func (authorityService *AuthorityService) CreateAuthority(auth system.SysAuthori
 }
 
 //@author: [piexlmax](https://github.com/piexlmax)
+//@function: UpdateAuthority
+//@description: 更改一个角色
+//@param: auth model.SysAuthority
+//@return: authority system.SysAuthority, err error
+
+func (authorityService *AuthorityService) UpdateAuthority(auth system.SysAuthority) (authority system.SysAuthority, err error) {
+	err = global.GVA_DB.Where("authority_id = ?", auth.AuthorityId).First(&system.SysAuthority{}).Updates(&auth).Error
+	return auth, err
+}
+
+//@author: [piexlmax](https://github.com/piexlmax)
+//@function: DeleteAuthority
+//@description: 删除角色
+//@param: auth *model.SysAuthority
+//@return: err error
+
+func (authorityService *AuthorityService) DeleteAuthority(auth *system.SysAuthority) (err error) {
+	if errors.Is(global.GVA_DB.Debug().Preload("Users").First(&auth)) {
+
+	}
+}
+
+//@author: [piexlmax](https://github.com/piexlmax)
 //@function: GetAuthorityInfoList
 //@description: 分页获取数据
 //@param: info request.PageInfo
