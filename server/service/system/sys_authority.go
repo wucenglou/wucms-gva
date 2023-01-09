@@ -42,9 +42,40 @@ func (authorityService *AuthorityService) UpdateAuthority(auth system.SysAuthori
 //@return: err error
 
 func (authorityService *AuthorityService) DeleteAuthority(auth *system.SysAuthority) (err error) {
-	if errors.Is(global.GVA_DB.Debug().Preload("Users").First(&auth)) {
-
+	if errors.Is(global.GVA_DB.Debug().Preload("Users").First(&auth).Error, gorm.ErrRecordNotFound) {
+		return errors.New("该角色不存在")
 	}
+	if len(auth.Users) != 0 {
+		return errors.New("此角色有用户正在使用禁止删除")
+	}
+	if !errors.Is(global.GVA_DB.Where("authority_id = ?", auth.AuthorityId).First(&system.SysUser{}).Error, gorm.ErrRecordNotFound) {
+		return errors.New("此角色由用户正在使用禁止删除")
+	}
+	if !errors.Is(global.GVA_DB.Where("parent_id = ?", auth.AuthorityId).First(&system.SysAuthority{}).Error, gorm.ErrRecordNotFound) {
+		return errors.New("此角色存在子角色不允许删除")
+	}
+	db := global.GVA_DB.Preload("SysBaseMenus").Where("authority_id = ?", auth.AuthorityId).First(auth)
+	err = db.Unscoped().Delete(auth).Error
+	if err != nil {
+		return
+	}
+	if len(auth.SysBaseMenus) > 0 {
+		err = global.GVA_DB.Model(auth).Association("SysBaseMenus").Delete(auth.SysBaseMenus)
+		if err != nil {
+			return
+		}
+	}
+	err = global.GVA_DB.Delete(&[]system.SysUserAuthority{}, "sys_authority_authority_id = ?", auth.AuthorityId).Error
+	if err != nil {
+		return
+	}
+	err = global.GVA_DB.Delete(&[]system.SysAuthorityBtn{}, "authority_id = ?", auth.AuthorityId).Error
+	if err != nil {
+		return
+	}
+	// authorityId := strconv.Itoa(int(auth.AuthorityId))
+	// CasbinServiceApp.ClearCasbin(0, authorityId)
+	return err
 }
 
 //@author: [piexlmax](https://github.com/piexlmax)
