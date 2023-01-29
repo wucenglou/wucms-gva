@@ -10,15 +10,17 @@ type ApiGroup struct {
 	SystemApiApi
 	AuthorityApi
 	AuthorityMenuApi
+	OperationRecordApi
 }
 
 var (
-	apiService          = service.ServiceGroupApp.SystemServiceGroup.ApiService
-	jwtService          = service.ServiceGroupApp.SystemServiceGroup.JwtService
-	userService         = service.ServiceGroupApp.SystemServiceGroup.UserService
-	menuService         = service.ServiceGroupApp.SystemServiceGroup.MenuService
-	initDBService       = service.ServiceGroupApp.SystemServiceGroup.InitDBService
-	baseMenuService     = service.ServiceGroupApp.SystemServiceGroup.BaseMenuService
-	authorityService    = service.ServiceGroupApp.SystemServiceGroup.AuthorityService
-	systemConfigService = service.ServiceGroupApp.SystemServiceGroup.SystemConfigService
+	apiService             = service.ServiceGroupApp.SystemServiceGroup.ApiService
+	jwtService             = service.ServiceGroupApp.SystemServiceGroup.JwtService
+	userService            = service.ServiceGroupApp.SystemServiceGroup.UserService
+	menuService            = service.ServiceGroupApp.SystemServiceGroup.MenuService
+	initDBService          = service.ServiceGroupApp.SystemServiceGroup.InitDBService
+	baseMenuService        = service.ServiceGroupApp.SystemServiceGroup.BaseMenuService
+	authorityService       = service.ServiceGroupApp.SystemServiceGroup.AuthorityService
+	systemConfigService    = service.ServiceGroupApp.SystemServiceGroup.SystemConfigService
+	operationRecordService = service.ServiceGroupApp.SystemServiceGroup.OperationRecordService
 )

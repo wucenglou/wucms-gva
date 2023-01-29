@@ -114,7 +114,7 @@ func (a *AuthorityMenuApi) GetMenuAuthority(c *gin.Context) {
 // @Param     data  body      system.SysBaseMenu             true  "路由path, 父菜单ID, 路由name, 对应前端文件路径, 排序标记"
 // @Success   200   {object}  response.Response{msg=string}  "新增菜单"
 // @Router    /menu/addBaseMenu [post]
-func (a *AuthorityApi) AddBaseMenu(c *gin.Context) {
+func (a *AuthorityMenuApi) AddBaseMenu(c *gin.Context) {
 	var menu system.SysBaseMenu
 	err := c.ShouldBindJSON(&menu)
 	if err != nil {

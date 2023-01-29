@@ -67,7 +67,7 @@ func (a *AuthorityApi) DeleteAuthority(c *gin.Context) {
 	err = authorityService.DeleteAuthority(&authority)
 	if err != nil { // 删除角色之前需要判断是否有用户正在使用此角色
 		global.GVA_LOG.Error("删除失败！", zap.Error(err))
-		response.FailWithMessage("删除失败" + err.Error(), c)
+		response.FailWithMessage("删除失败"+err.Error(), c)
 		return
 	}
 	response.OkWithMessage("删除成功", c)
@@ -115,12 +115,17 @@ func (a *AuthorityApi) UpdateAuthority(c *gin.Context) {
 // @Router /authority/getAuthorityList [post]
 func (a *AuthorityApi) GetAuthorityList(c *gin.Context) {
 	var pageInfo request.PageInfo
-	_ = c.ShouldBindJSON(&pageInfo)
-	if err := utils.Verify(pageInfo, utils.PageInfoVerify); err != nil {
+	err := c.ShouldBindJSON(&pageInfo)
+	if err != nil {
+		response.FailWithMessage(err.Error(), c)
+	}
+	err = utils.Verify(pageInfo, utils.PageInfoVerify)
+	if err != nil {
 		response.FailWithMessage(err.Error(), c)
 		return
 	}
-	if list, total, err := authorityService.GetAuthorityInfoList(pageInfo); err != nil {
+	list, total, err := authorityService.GetAuthorityInfoList(pageInfo)
+	if err != nil {
 		global.GVA_LOG.Error("获取失败!", zap.Error(err))
 		response.FailWithMessage("获取失败"+err.Error(), c)
 	} else {
