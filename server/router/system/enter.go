@@ -12,6 +12,6 @@ type RouterGroup struct {
 	// AutoCodeRouter
 	AuthorityRouter
 	// DictionaryRouter
-	// OperationRecordRouter
+	OperationRecordRouter
 	// DictionaryDetailRouter
 }

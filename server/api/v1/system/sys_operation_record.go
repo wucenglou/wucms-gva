@@ -141,9 +141,9 @@ func (s *OperationRecordApi) GetSysOperationRecordList(c *gin.Context) {
 		return
 	}
 	response.OkWithDetailed(response.PageResult{
-		List:  list,
-		Total: total,
-		Page:  pageInfo.Page,
+		List:     list,
+		Total:    total,
+		Page:     pageInfo.Page,
+		PageSize: pageInfo.PageSize,
 	}, "获取成功", c)
-
 }
