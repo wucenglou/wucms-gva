@@ -16,6 +16,7 @@ func (s *ApiRouter) InitApiRouter(Router *gin.RouterGroup) {
 		// apiRouter.POST()
 	}
 	{
-		apiRouterWithoutRecord.POST("getAllApis", apiRouterApi.GetAllApis)
+		apiRouterWithoutRecord.POST("getAllApis", apiRouterApi.GetAllApis) // 获取所有api
+		apiRouterWithoutRecord.POST("getApiList", apiRouterApi.GetApiList) // 获取Api列表
 	}
 }
