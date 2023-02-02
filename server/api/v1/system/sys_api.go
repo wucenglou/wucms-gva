@@ -1,7 +1,9 @@
 package system
 
 import (
+	"fmt"
 	"wucms-gva/server/global"
+	"wucms-gva/server/model/common/request"
 	"wucms-gva/server/model/common/response"
 	"wucms-gva/server/model/system"
 	"wucms-gva/server/utils"
@@ -37,9 +39,10 @@ func (s *SystemApiApi) CreateApi(c *gin.Context) {
 		return
 	}
 	err = apiService.CreateApi(api)
+	fmt.Println(err)
 	if err != nil {
 		global.GVA_LOG.Error("创建失败！", zap.Error(err))
-		response.FailWithMessage("创建失败", c)
+		response.FailWithMessage(fmt.Sprint("创建失败", err), c)
 		return
 	}
 	response.OkWithMessage("创建成功", c)
@@ -119,26 +122,26 @@ func (s *SystemApiApi) GetApiList(c *gin.Context) {
 // @Param     data  body      request.GetById                                   true  "根据id获取api"
 // @Success   200   {object}  response.Response{data=systemRes.SysAPIResponse}  "根据id获取api,返回包括api详情"
 // @Router    /api/getApiById [post]
-// func (s *SystemApiApi) GetApiById(c *gin.Context) {
-// 	var idInfo requset.GetById
-// 	err := c.ShouldBindJSON(&idInfo)
-// 	if err != nil {
-// 		response.FailWithMessage(err.Error(), c)
-// 		return
-// 	}
-// 	err = utils.Verify(idInfo, utils.IdVerify)
-// 	if err != nil {
-// 		response.FailWithMessage(err.Error(), c)
-// 		return
-// 	}
-// 	api, err := apiService.GetApiById(idInfo.ID)
-// 	if err != nil {
-// 		global.GVA_LOG.Error("获取失败！", zap.Error(err))
-// 		response.FailWithMessage("获取失败", c)
-// 		return
-// 	}
-// 	response.OkWithDetailed(systemRes.SysAPIResponse{Api: api}, "获取成功", c)
-// }
+func (s *SystemApiApi) GetApiById(c *gin.Context) {
+	var idInfo request.GetById
+	err := c.ShouldBindJSON(&idInfo)
+	if err != nil {
+		response.FailWithMessage(err.Error(), c)
+		return
+	}
+	err = utils.Verify(idInfo, utils.IdVerify)
+	if err != nil {
+		response.FailWithMessage(err.Error(), c)
+		return
+	}
+	api, err := apiService.GetApiById(idInfo.ID)
+	if err != nil {
+		global.GVA_LOG.Error("获取失败！", zap.Error(err))
+		response.FailWithMessage("获取失败", c)
+		return
+	}
+	response.OkWithDetailed(systemRes.SysAPIResponse{Api: api}, "获取成功", c)
+}
 
 // UpdateApi
 // @Tags      SysApi
@@ -149,26 +152,26 @@ func (s *SystemApiApi) GetApiList(c *gin.Context) {
 // @Param     data  body      system.SysApi                  true  "api路径, api中文描述, api组, 方法"
 // @Success   200   {object}  response.Response{msg=string}  "修改基础api"
 // @Router    /api/updateApi [post]
-// func (s *SystemApiApi) UpdateApi(c *gin.Context) {
-// 	var api system.SysApi
-// 	err := c.ShouldBindJSON(&api)
-// 	if err != nil {
-// 		response.FailWithMessage(err.Error(), c)
-// 		return
-// 	}
-// 	err = utils.Verify(api, utils.ApiVerify)
-// 	if err != nil {
-// 		response.FailWithMessage(err.Error(), c)
-// 		return
-// 	}
-// 	err = apiService.UpdateApi(api)
-// 	if err != nil {
-// 		global.GVA_LOG.Error("修改失败!", zap.Error(err))
-// 		response.FailWithMessage("修改失败", c)
-// 		return
-// 	}
-// 	response.OkWithMessage("修改成功", c)
-// }
+func (s *SystemApiApi) UpdateApi(c *gin.Context) {
+	var api system.SysApi
+	err := c.ShouldBindJSON(&api)
+	if err != nil {
+		response.FailWithMessage(err.Error(), c)
+		return
+	}
+	err = utils.Verify(api, utils.ApiVerify)
+	if err != nil {
+		response.FailWithMessage(err.Error(), c)
+		return
+	}
+	err = apiService.UpdateApi(api)
+	if err != nil {
+		global.GVA_LOG.Error("修改失败!", zap.Error(err))
+		response.FailWithMessage("修改失败", c)
+		return
+	}
+	response.OkWithMessage("修改成功", c)
+}
 
 // GetAllApis
 // @Tags      SysApi
@@ -197,18 +200,18 @@ func (s *SystemApiApi) GetAllApis(c *gin.Context) {
 // @Param     data  body      request.IdsReq                 true  "ID"
 // @Success   200   {object}  response.Response{msg=string}  "删除选中Api"
 // @Router    /api/deleteApisByIds [delete]
-// func (s *SystemApiApi) DeleteApisByIds(c *gin.Context) {
-// 	var ids request.IdsReq
-// 	err := c.ShouldBindJSON(&ids)
-// 	if err != nil {
-// 		response.FailWithMessage(err.Error(),c)
-// 		return
-// 	}
-// 	err = apiService.DeleteApisByIds(ids)
-// 	if err != nil {
-// 		global.GVA_LOG.Error("删除失败！",zap.Error(err))
-// 		response.FailWithMessage("删除失败",c)
-// 		return
-// 	}
-// 	response.OkWithMessage("删除成功", c)
-// }
+func (s *SystemApiApi) DeleteApisByIds(c *gin.Context) {
+	var ids request.IdsReq
+	err := c.ShouldBindJSON(&ids)
+	if err != nil {
+		response.FailWithMessage(err.Error(), c)
+		return
+	}
+	err = apiService.DeleteApisByIds(ids)
+	if err != nil {
+		global.GVA_LOG.Error("删除失败！", zap.Error(err))
+		response.FailWithMessage("删除失败", c)
+		return
+	}
+	response.OkWithMessage("删除成功", c)
+}
