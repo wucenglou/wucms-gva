@@ -62,6 +62,7 @@ func Routers() *gin.Engine {
 		systemRouter.InitJwtRouter(PrivateGroup)                // jwt相关路由
 		systemRouter.InitMenuRouter(PrivateGroup)               // 注册menu路由
 		systemRouter.InitSystemRouter(PrivateGroup)             // system相关路由
+		systemRouter.InitCasbinRouter(PrivateGroup)             // 权限相关路由
 		systemRouter.InitAuthorityRouter(PrivateGroup)          // 注册角色路由
 		systemRouter.InitSysOperationRecordRouter(PrivateGroup) // 操作记录
 

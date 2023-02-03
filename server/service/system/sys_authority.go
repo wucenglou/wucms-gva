@@ -99,6 +99,28 @@ func (authorityService *AuthorityService) GetAuthorityInfoList(info request.Page
 	return authority, total, err
 }
 
+// @author: [piexlmax](https://github.com/piexlmax)
+// @function: GetAuthorityInfo
+// @description: 获取所有角色信息
+// @param: auth model.SysAuthority
+// @return: sa system.SysAuthority, err error
+func (authorityService *AuthorityService) GetAuthorityInfo(auth system.SysAuthority) (sa system.SysAuthority, err error) {
+	err = global.GVA_DB.Preload("DataAuthorityId").Where("authority_id = ?", auth.AuthorityId).First(&sa).Error
+	return sa, err
+}
+
+// @author: [piexlmax](https://github.com/piexlmax)
+// @function: SetDataAuthority
+// @description: 设置角色资源权限
+// @param: auth model.SysAuthority
+// @return: error
+func (authorityService *AuthorityService) SetDataAuthority(auth system.SysAuthority) error {
+	var s system.SysAuthority
+	global.GVA_DB.Preload("DataAuthority").First(&s, "authority_id = ?", auth.AuthorityId)
+	err := global.GVA_DB.Model(&s).Association("DataAuthorityId").Replace(&auth.DataAuthorityId)
+	return err
+}
+
 //@author: [piexlmax](https://github.com/piexlmax)
 //@function: SetMenuAuthority
 //@description: 菜单与角色绑定
