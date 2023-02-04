@@ -33,33 +33,40 @@ captcha:
     key-long: 6
     img-width: 240
     img-height: 80
+    open-captcha: 0
+    open-captcha-timeout: 3600
 cors:
-    mode: whitelist
-    whitelist:
-        - allow-origin: example1.com
-          allow-methods: GET, POST
-          allow-headers: content-type
-          expose-headers: Content-Length, Access-Control-Allow-Origin, Access-Control-Allow-Headers, Content-Type
-          allow-credentials: true
-        - allow-origin: example2.com
-          allow-methods: GET, POST
-          allow-headers: content-type
-          expose-headers: Content-Length, Access-Control-Allow-Origin, Access-Control-Allow-Headers, Content-Type
-          allow-credentials: true
+  mode: strict-whitelist
+  whitelist:
+  - allow-origin: example1.com
+    allow-methods: POST, GET
+    allow-headers: Content-Type,AccessToken,X-CSRF-Token, Authorization, Token,X-Token,X-User-Id
+    expose-headers: Content-Length, Access-Control-Allow-Origin, Access-Control-Allow-Headers,
+      Content-Type
+    allow-credentials: true
+  - allow-origin: example2.com
+    allow-methods: GET, POST
+    allow-headers: content-type
+    expose-headers: Content-Length, Access-Control-Allow-Origin, Access-Control-Allow-Headers,
+      Content-Type
+    allow-credentials: true
 db-list:
-    - disable: false
-      type: ""
-      alias-name: ""
-      path: ""
-      port: ""
-      config: ""
-      db-name: ""
-      username: ""
-      password: ""
-      max-idle-conns: 10
-      max-open-conns: 100
-      log-mode: ""
-      log-zap: false
+- disable: true
+  type: ""
+  alias-name: ""
+  path: ""
+  port: ""
+  config: ""
+  db-name: ""
+  username: ""
+  password: ""
+  prefix: ""
+  singular: false
+  engine: ""
+  max-idle-conns: 10
+  max-open-conns: 100
+  log-mode: ""
+  log-zap: false
 email:
     to: 1149009xxx@qq.com
     port: 465
@@ -78,26 +85,23 @@ hua-wei-obs:
     secret-key: you-secret-key
 jwt:
     signing-key: 45292836-fac3-432b-812a-36901c2b1d75
-    expires-time: 604800
-    buffer-time: 86400
+    expires-time: 7d
+    buffer-time: 1d
     issuer: qmPlus
 local:
     path: uploads/file
     store-path: uploads/file
 mysql:
-  path: 127.0.0.1
-  port: "3306"
-  config: charset=utf8mb4&parseTime=True&loc=Local
-  db-name: gva
-  username: root
-  password: "123456"
-  prefix: ""
-  singular: false
-  engine: ""
-  max-idle-conns: 10
-  max-open-conns: 100
-  log-mode: error
-  log-zap: false
+    path: 127.0.0.1
+    port: "3306"
+    config: charset=utf8mb4&parseTime=True&loc=Local
+    db-name: gva
+    username: root
+    password: "123456"
+    max-idle-conns: 10
+    max-open-conns: 100
+    log-mode: error
+    log-zap: false
 pgsql:
     path: ""
     port: ""
@@ -140,6 +144,7 @@ tencent-cos:
 timer:
     start: true
     spec: '@daily'
+    with_seconds: false
     detail:
         - tableName: sys_operation_records
           compareField: created_at
@@ -149,7 +154,7 @@ timer:
           interval: 168h
 zap:
     level: info
-    prefix: '[github.com/wucenglou/wucms-gva/server]'
+    prefix: '[wucms-gva]'
     format: console
     director: log
     encode-level: LowercaseColorLevelEncoder

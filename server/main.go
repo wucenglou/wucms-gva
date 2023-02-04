@@ -12,6 +12,7 @@ import (
 func main() {
 	fmt.Println("1*******************************")
 	global.GVA_VP = core.Viper() // 初始化Viper
+	initialize.OtherInit()
 	fmt.Println("2*******************************")
 	global.GVA_LOG = core.Zap() // 初始化zap日志库
 	zap.ReplaceGlobals(global.GVA_LOG)

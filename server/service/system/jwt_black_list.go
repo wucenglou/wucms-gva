@@ -2,9 +2,9 @@ package system
 
 import (
 	"context"
-	"time"
 	"wucms-gva/server/global"
 	"wucms-gva/server/model/system"
+	"wucms-gva/server/utils"
 
 	"go.uber.org/zap"
 )
@@ -44,11 +44,11 @@ func (jwtService *JwtService) IsBlacklist(jwt string) bool {
 //@function: GetRedisJWT
 //@description: 从redis取jwt
 //@param: userName string
-//@return: err error, redisJWT string
+//@return: redisJWT string, err error
 
-func (jwtService *JwtService) GetRedisJWT(userName string) (err error, redisJWT string) {
+func (jwtService *JwtService) GetRedisJWT(userName string) (redisJWT string, err error) {
 	redisJWT, err = global.GVA_REDIS.Get(context.Background(), userName).Result()
-	return err, redisJWT
+	return redisJWT, err
 }
 
 //@author: [piexlmax](https://github.com/piexlmax)
@@ -59,7 +59,11 @@ func (jwtService *JwtService) GetRedisJWT(userName string) (err error, redisJWT 
 
 func (jwtService *JwtService) SetRedisJWT(jwt string, userName string) (err error) {
 	// 此处过期时间等于jwt过期时间
-	timer := time.Duration(global.GVA_CONFIG.JWT.ExpiresTime) * time.Second
+	dr, err := utils.ParseDuration(global.GVA_CONFIG.JWT.ExpiresTime)
+	if err != nil {
+		return err
+	}
+	timer := dr
 	err = global.GVA_REDIS.Set(context.Background(), userName, jwt, timer).Err()
 	return err
 }
