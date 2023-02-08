@@ -3,8 +3,8 @@ package system
 import (
 	"errors"
 	"wucms-gva/server/global"
-	"wucms-gva/server/model/common/request"
 	"wucms-gva/server/model/system"
+	"wucms-gva/server/model/system/request"
 
 	"gorm.io/gorm"
 )
@@ -105,7 +105,7 @@ func (dictionaryService *DictionaryService) GetSysDictionaryInfoList(info reques
 	if info.Type != "" {
 		db = db.Where("`type` LIKE ?", "%"+info.Type+"%")
 	}
-	if info.Status != "" {
+	if info.Status != nil {
 		db = db.Where("`status` = ?", info.Status)
 	}
 	if info.Desc != "" {
