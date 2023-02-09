@@ -3,6 +3,7 @@ package system
 import (
 	"errors"
 	"go/token"
+	"strings"
 	"wucms-gva/server/global"
 )
 
@@ -15,12 +16,21 @@ type AutoCodeStruct struct {
 	Abbreviation       string   `json:"abbreviation"`       // Struct简称
 	Description        string   `json:"description"`        // Struct中文名称
 	AutoCreateApiToSql bool     `json:"autoCreateApiToSql"` // 是否自动创建api
+	AutoCreateResource bool     `json:"autoCreateResource"` // 是否自动创建资源标识
 	AutoMoveFile       bool     `json:"autoMoveFile"`       // 是否自动移动文件
+	BusinessDB         string   `json:"businessDB"`         // 业务数据库
 	Fields             []*Field `json:"fields,omitempty"`
 	HasTimer           bool
 	DictTypes          []string `json:"-"`
 	Package            string   `json:"package"`
 	PackageT           string   `json:"-"`
+	NeedValid          bool     `json:"-"`
+	NeedSort           bool     `json:"-"`
+}
+
+func (a *AutoCodeStruct) Pretreatment() {
+	a.KeyWord()
+	a.SuffixTest()
 }
 
 // KeyWord 是go关键字的处理加上 _ ，防止编译报错
@@ -28,6 +38,14 @@ type AutoCodeStruct struct {
 func (a *AutoCodeStruct) KeyWord() {
 	if token.IsKeyword(a.Abbreviation) {
 		a.Abbreviation = a.Abbreviation + "_"
+	}
+}
+
+// SuffixTest 处理_test 后缀
+// Author [SliverHorn](https://github.com/SliverHorn)
+func (a *AutoCodeStruct) SuffixTest() {
+	if strings.HasSuffix(a.HumpPackageName, "test") {
+		a.HumpPackageName = a.HumpPackageName + "_"
 	}
 }
 
@@ -41,9 +59,13 @@ type Field struct {
 	ColumnName      string `json:"columnName"`      // 数据库字段
 	FieldSearchType string `json:"fieldSearchType"` // 搜索条件
 	DictType        string `json:"dictType"`        // 字典
+	Require         bool   `json:"require"`         // 是否必填
+	ErrorText       string `json:"errorText"`       // 校验失败文字
+	Clearable       bool   `json:"clearable"`       // 是否可清空
+	Sort            bool   `json:"sort"`            // 是否增加排序
 }
 
-var AutoMoveErr error = errors.New("创建代码成功并移动文件成功")
+var ErrAutoMove error = errors.New("创建代码成功并移动文件成功")
 
 type SysAutoCode struct {
 	global.GVA_MODEL

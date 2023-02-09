@@ -95,8 +95,7 @@ require (
 	go.uber.org/multierr v1.6.0 // indirect
 	golang.org/x/image v0.0.0-20190802002840-cff245a6509b // indirect
 	golang.org/x/net v0.0.0-20220520000938-2e3eb7b945c2 // indirect
-	golang.org/x/sys v0.0.0-20220520151302-bc2c85ada10a // indirect
-	golang.org/x/text v0.3.7 // indirect
+	golang.org/x/sys v0.0.0-20220715151400-c0bba94af5f8 // indirect
 	golang.org/x/tools v0.1.10 // indirect
 	google.golang.org/protobuf v1.28.0 // indirect
 	gopkg.in/ini.v1 v1.66.4 // indirect
@@ -113,4 +112,8 @@ require (
 
 require github.com/go-sql-driver/mysql v1.6.0
 
-require github.com/qiniu/api.v7/v7 v7.8.2
+require (
+	github.com/otiai10/copy v1.7.0
+	github.com/qiniu/api.v7/v7 v7.8.2
+	golang.org/x/text v0.3.7
+)
