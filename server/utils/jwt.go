@@ -14,10 +14,10 @@ type JWT struct {
 }
 
 var (
-	ErrTokenExpired     = errors.New("Token is expired")
-	ErrTokenNotValidYet = errors.New("Token not active yet")
-	ErrTokenMalformed   = errors.New("That's not even a token")
-	ErrTokenInvalid     = errors.New("Couldn't handle this token:")
+	TokenExpired     = errors.New("Token is expired")
+	TokenNotValidYet = errors.New("Token not active yet")
+	TokenMalformed   = errors.New("That's not even a token")
+	TokenInvalid     = errors.New("Couldn't handle this token:")
 )
 
 func NewJWT() *JWT {
@@ -63,14 +63,14 @@ func (j *JWT) ParseToken(tokenString string) (*request.CustomClaims, error) {
 	if err != nil {
 		if ve, ok := err.(*jwt.ValidationError); ok {
 			if ve.Errors&jwt.ValidationErrorMalformed != 0 {
-				return nil, ErrTokenMalformed
+				return nil, TokenMalformed
 			} else if ve.Errors&jwt.ValidationErrorExpired != 0 {
 				// Token is expired
-				return nil, ErrTokenExpired
+				return nil, TokenExpired
 			} else if ve.Errors&jwt.ValidationErrorNotValidYet != 0 {
-				return nil, ErrTokenNotValidYet
+				return nil, TokenNotValidYet
 			} else {
-				return nil, ErrTokenInvalid
+				return nil, TokenInvalid
 			}
 		}
 	}
@@ -78,9 +78,9 @@ func (j *JWT) ParseToken(tokenString string) (*request.CustomClaims, error) {
 		if claims, ok := token.Claims.(*request.CustomClaims); ok && token.Valid {
 			return claims, nil
 		}
-		return nil, ErrTokenInvalid
+		return nil, TokenInvalid
 
 	} else {
-		return nil, ErrTokenInvalid
+		return nil, TokenInvalid
 	}
 }

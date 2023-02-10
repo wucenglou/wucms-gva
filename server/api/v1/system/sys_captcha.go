@@ -65,5 +65,6 @@ func interfaceToInt(v interface{}) (i int) {
 	default:
 		i = 0
 	}
+
 	return
 }

@@ -115,9 +115,6 @@ func (initDBService *InitDBService) InitDB(conf request.InitDB) (err error) {
 	db := ctx.Value("db").(*gorm.DB)
 	global.GVA_DB = db
 
-	if err = initHandler.WriteConfig(ctx); err != nil {
-		return err
-	}
 	if err = initHandler.InitTables(ctx, initializers); err != nil {
 		return err
 	}
@@ -125,6 +122,9 @@ func (initDBService *InitDBService) InitDB(conf request.InitDB) (err error) {
 		return err
 	}
 
+	if err = initHandler.WriteConfig(ctx); err != nil {
+		return err
+	}
 	initializers = initSlice{}
 	cache = map[string]*orderedInitializer{}
 	return nil

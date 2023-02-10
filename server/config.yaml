@@ -10,6 +10,7 @@ autocode:
     root: D:\phpstudy_pro\WWW\WS\go\wucms-gva
     server: /server
     server-api: /api/v1/%s
+    server-plug: ""
     server-initialize: /initialize
     server-model: /model/%s
     server-request: /model/%s/request/
@@ -82,7 +83,7 @@ hua-wei-obs:
     access-key: you-access-key
     secret-key: you-secret-key
 jwt:
-    signing-key: 45292836-fac3-432b-812a-36901c2b1d75
+    signing-key: aeb5bad0-efb5-486c-814d-b7b9a850f977
     expires-time: 7d
     buffer-time: 1d
     issuer: qmPlus
@@ -93,7 +94,7 @@ mysql:
     path: 127.0.0.1
     port: "3306"
     config: charset=utf8mb4&parseTime=True&loc=Local
-    db-name: gva
+    db-name: wucms_gva
     username: root
     password: "123456"
     prefix: ""
