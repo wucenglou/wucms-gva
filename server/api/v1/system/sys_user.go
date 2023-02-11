@@ -1,6 +1,7 @@
 package system
 
 import (
+	"strconv"
 	"wucms-gva/server/global"
 	"wucms-gva/server/model/common/request"
 	"wucms-gva/server/model/common/response"
@@ -15,13 +16,23 @@ import (
 	"go.uber.org/zap"
 )
 
-// systemReq "wucms-gva/server/model/system/request"
-// systemRes "wucms-gva/server/model/system/response"
-
+// Login
+// @Tags     Base
+// @Summary  用户登录
+// @Produce   application/json
+// @Param    data  body      systemReq.Login                                             true  "用户名, 密码, 验证码"
+// @Success  200   {object}  response.Response{data=systemRes.LoginResponse,msg=string}  "返回包括用户信息,token,过期时间"
+// @Router   /base/login [post]
 func (b *BaseApi) Login(c *gin.Context) {
 	print("6666666666666666666666666666666")
 	var l systemReq.Login
-	_ = c.ShouldBindJSON(&l)
+	err := c.ShouldBindJSON(&l)
+	// key := c.ClientIP()
+	if err != nil {
+		response.FailWithMessage(err.Error(), c)
+		return
+	}
+
 	if err := utils.Verify(l, utils.LoginVerify); err != nil {
 		response.FailWithMessage(err.Error(), c)
 		return
@@ -103,31 +114,6 @@ func (b *BaseApi) Register(c *gin.Context) {
 	response.OkWithDetailed(systemRes.SysUserResponse{User: userReturn}, "注册成功！", c)
 }
 
-// SetUserAuthorities
-// @Tags      SysUser
-// @Summary   设置用户权限
-// @Security  ApiKeyAuth
-// @accept    application/json
-// @Produce   application/json
-// @Param     data  body      systemReq.SetUserAuthorities   true  "用户UUID, 角色ID"
-// @Success   200   {object}  response.Response{msg=string}  "设置用户权限"
-// @Router    /user/setUserAuthorities [post]
-func (b *BaseApi) SetUserAuthorities(c *gin.Context) {
-	var sua systemReq.SetUserAuthorities
-	err := c.ShouldBindJSON(&sua)
-	if err != nil {
-		response.FailWithMessage(err.Error(), c)
-		return
-	}
-	err = userService.SetUserAuthorities(sua.ID, sua.AuthorityIds)
-	if err != nil {
-		global.GVA_LOG.Error("修改失败！", zap.Error(err))
-		response.FailWithMessage("修改失败", c)
-		return
-	}
-	response.OkWithMessage("修改成功", c)
-}
-
 // ChangePassword
 // @Tags      SysUser
 // @Summary   用户修改密码
@@ -191,6 +177,71 @@ func (b *BaseApi) GetUserList(c *gin.Context) {
 		Page:     pageInfo.Page,
 		PageSize: pageInfo.PageSize,
 	}, "获取成功", c)
+}
+
+// SetUserAuthority
+// @Tags      SysUser
+// @Summary   更改用户权限
+// @Security  ApiKeyAuth
+// @accept    application/json
+// @Produce   application/json
+// @Param     data  body      systemReq.SetUserAuth          true  "用户UUID, 角色ID"
+// @Success   200   {object}  response.Response{msg=string}  "设置用户权限"
+// @Router    /user/setUserAuthority [post]
+func (b *BaseApi) SetUserAuthority(c *gin.Context) {
+	var sua systemReq.SetUserAuth
+	err := c.ShouldBindJSON(&sua)
+	if err != nil {
+		response.FailWithMessage(err.Error(), c)
+		return
+	}
+	if UserVerifyErr := utils.Verify(sua, utils.SetUserAuthorityVerify); UserVerifyErr != nil {
+		response.FailWithMessage(UserVerifyErr.Error(), c)
+		return
+	}
+	userID := utils.GetUserID(c)
+	err = userService.SetUserAuthority(userID, sua.AuthorityId)
+	if err != nil {
+		global.GVA_LOG.Error("修改失败！", zap.Error(err))
+		response.FailWithMessage(err.Error(), c)
+		return
+	}
+	claims := utils.GetUserInfo(c)
+	j := &utils.JWT{SigningKey: []byte(global.GVA_CONFIG.JWT.SigningKey)} // 唯一签名
+	claims.AuthorityId = sua.AuthorityId
+	if token, err := j.CreateToken(*claims); err != nil {
+		global.GVA_LOG.Error("修改失败！", zap.Error(err))
+		response.FailWithMessage(err.Error(), c)
+	} else {
+		c.Header("new-token", token)
+		c.Header("new-expires-at", strconv.FormatInt(claims.ExpiresAt, 10))
+		response.OkWithMessage("修改成功", c)
+	}
+}
+
+// SetUserAuthorities
+// @Tags      SysUser
+// @Summary   设置用户权限
+// @Security  ApiKeyAuth
+// @accept    application/json
+// @Produce   application/json
+// @Param     data  body      systemReq.SetUserAuthorities   true  "用户UUID, 角色ID"
+// @Success   200   {object}  response.Response{msg=string}  "设置用户权限"
+// @Router    /user/setUserAuthorities [post]
+func (b *BaseApi) SetUserAuthorities(c *gin.Context) {
+	var sua systemReq.SetUserAuthorities
+	err := c.ShouldBindJSON(&sua)
+	if err != nil {
+		response.FailWithMessage(err.Error(), c)
+		return
+	}
+	err = userService.SetUserAuthorities(sua.ID, sua.AuthorityIds)
+	if err != nil {
+		global.GVA_LOG.Error("修改失败！", zap.Error(err))
+		response.FailWithMessage("修改失败", c)
+		return
+	}
+	response.OkWithMessage("修改成功", c)
 }
 
 // DeleteUser
@@ -270,6 +321,42 @@ func (b *BaseApi) SetUserInfo(c *gin.Context) {
 	})
 	if err != nil {
 		global.GVA_LOG.Error("设置失败", zap.Error(err))
+		response.FailWithMessage("设置失败", c)
+		return
+	}
+	response.OkWithMessage("设置成功", c)
+}
+
+// SetSelfInfo
+// @Tags      SysUser
+// @Summary   设置用户信息
+// @Security  ApiKeyAuth
+// @accept    application/json
+// @Produce   application/json
+// @Param     data  body      system.SysUser                                             true  "ID, 用户名, 昵称, 头像链接"
+// @Success   200   {object}  response.Response{data=map[string]interface{},msg=string}  "设置用户信息"
+// @Router    /user/SetSelfInfo [put]
+func (b *BaseApi) SetSelfInfo(c *gin.Context) {
+	var user systemReq.ChangeUserInfo
+	err := c.ShouldBindJSON(&user)
+	if err != nil {
+		response.FailWithMessage(err.Error(), c)
+		return
+	}
+	user.ID = utils.GetUserID(c)
+	err = userService.SetUserInfo(system.SysUser{
+		GVA_MODEL: global.GVA_MODEL{
+			ID: user.ID,
+		},
+		NickName:  user.NickName,
+		HeaderImg: user.HeaderImg,
+		Phone:     user.Phone,
+		Email:     user.Email,
+		SideMode:  user.SideMode,
+		Enable:    user.Enable,
+	})
+	if err != nil {
+		global.GVA_LOG.Error("设置失败!", zap.Error(err))
 		response.FailWithMessage("设置失败", c)
 		return
 	}

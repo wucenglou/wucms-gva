@@ -5,6 +5,7 @@ import (
 	"wucms-gva/server/model/common/response"
 	"wucms-gva/server/model/system"
 	systemRes "wucms-gva/server/model/system/response"
+	"wucms-gva/server/utils"
 
 	"github.com/gin-gonic/gin"
 	"go.uber.org/zap"
@@ -37,14 +38,35 @@ func (s *SystemApi) GetSystemConfig(c *gin.Context) {
 // @Router /system/setSystemConfig [post]
 func (s *SystemApi) SetSystemConfig(c *gin.Context) {
 	var sys system.System
-	_ = c.ShouldBindJSON(&sys)
-	err := systemConfigService.SetSystemConfig(sys)
+	err := c.ShouldBindJSON(&sys)
+	if err != nil {
+		response.FailWithMessage(err.Error(), c)
+		return
+	}
+	err = systemConfigService.SetSystemConfig(sys)
 	if err != nil {
 		global.GVA_LOG.Error("设置失败!", zap.Error(err))
 		response.FailWithMessage("设置失败", c)
 	} else {
 		response.OkWithMessage("设置成功", c)
 	}
+}
+
+// ReloadSystem
+// @Tags      System
+// @Summary   重启系统
+// @Security  ApiKeyAuth
+// @Produce   application/json
+// @Success   200  {object}  response.Response{msg=string}  "重启系统"
+// @Router    /system/reloadSystem [post]
+func (s *SystemApi) ReloadSystem(c *gin.Context) {
+	err := utils.Reload()
+	if err != nil {
+		global.GVA_LOG.Error("重启系统失败！", zap.Error(err))
+		response.FailWithMessage("重启系统失败", c)
+		return
+	}
+	response.OkWithMessage("重启系统成功", c)
 }
 
 // @Tags System

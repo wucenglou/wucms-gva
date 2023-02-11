@@ -12,14 +12,13 @@ import (
 	"gorm.io/gorm"
 )
 
-//@author: [piexlmax](https://github.com/piexlmax)
-//@function: Register
-//@description: 用户注册
-//@param: u model.SysUser
-//@return: userInter system.SysUser, err error
-
 type UserService struct{}
 
+// @author: [piexlmax](https://github.com/piexlmax)
+// @function: Register
+// @description: 用户注册
+// @param: u model.SysUser
+// @return: userInter system.SysUser, err error
 func (userService *UserService) Register(u system.SysUser) (userInter system.SysUser, err error) {
 	var user system.SysUser
 	if !errors.Is(global.GVA_DB.Where("username=?", u.Username).First(&user).Error, gorm.ErrRecordNotFound) {
@@ -102,6 +101,20 @@ func (userService *UserService) GetUserInfoList(info request.PageInfo) (list int
 	}
 	err = db.Limit(limit).Offset(offset).Preload("Authorities").Preload("Authority").Find(&userList).Error
 	return userList, total, err
+}
+
+// @author: [piexlmax](https://github.com/piexlmax)
+// @function: SetUserAuthority
+// @description: 设置一个用户的权限
+// @param: uuid uuid.UUID, authorityId string
+// @return: err error
+func (userService *UserService) SetUserAuthority(id uint, authorityId uint) (err error) {
+	assignErr := global.GVA_DB.Where("sys_user_id = ? AND sys_authority_authority_id = ?", id, authorityId).First(&system.SysUserAuthority{}).Error
+	if errors.Is(assignErr, gorm.ErrRecordNotFound) {
+		return errors.New("该用户无此角色")
+	}
+	err = global.GVA_DB.Where("id = ?", id).First(&system.SysUser{}).Update("authority_id", authorityId).Error
+	return err
 }
 
 // @author: [piexlmax](https://github.com/piexlmax)
@@ -192,6 +205,30 @@ func (userService *UserService) GetUserInfo(uuid uuid.UUID) (user system.SysUser
 		reqUser.Authority.DefaultRouter = "404"
 	}
 	return reqUser, err
+}
+
+// @author: [SliverHorn](https://github.com/SliverHorn)
+// @function: FindUserById
+// @description: 通过id获取用户信息
+// @param: id int
+// @return: err error, user *model.SysUser
+func (userService *UserService) FindUserById(id int) (user *system.SysUser, err error) {
+	var u system.SysUser
+	err = global.GVA_DB.Where("`id` = ?", id).First(&u).Error
+	return &u, err
+}
+
+// @author: [SliverHorn](https://github.com/SliverHorn)
+// @function: FindUserByUuid
+// @description: 通过uuid获取用户信息
+// @param: uuid string
+// @return: err error, user *model.SysUser
+func (userService *UserService) FindUserByUuid(uuid string) (user *system.SysUser, err error) {
+	var u system.SysUser
+	if err = global.GVA_DB.Where("`uuid` = ?", uuid).First(&u).Error; err != nil {
+		return &u, errors.New("用户不存在")
+	}
+	return &u, nil
 }
 
 // @author: [piexlmax](https://github.com/piexlmax)
