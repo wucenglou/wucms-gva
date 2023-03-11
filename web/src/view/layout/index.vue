@@ -79,6 +79,7 @@
             <HistoryComponent ref="layoutHistoryComponent" />
           </div>
         </transition>
+
         <router-view
           v-if="reloadFlag"
           v-slot="{ Component }"
@@ -94,6 +95,7 @@
             </transition>
           </div>
         </router-view>
+        
         <BottomInfo />
         <setting />
       </el-main>
