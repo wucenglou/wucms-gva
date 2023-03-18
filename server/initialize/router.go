@@ -14,6 +14,7 @@ import (
 func Routers() *gin.Engine {
 	Router := gin.Default()
 	exampleRouter := router.RouterGroupApp.Example
+	pkgRouter := router.RouterGroupApp.Pkg
 	Router.GET("/ping", func(ctx *gin.Context) {
 		ctx.String(200, "ping")
 	})
@@ -53,6 +54,9 @@ func Routers() *gin.Engine {
 		})
 		systemRouter.InitBaseRouter(PublicGroup) // 注册基础功能路由 不做鉴权
 		systemRouter.InitInitRouter(PublicGroup) // 自动初始化相关
+
+		pkgRouter.InitMyApiRouter(PublicGroup)
+
 	}
 	PrivateGroup := Router.Group("")
 	PrivateGroup.Use(middleware.JWTAuth())
