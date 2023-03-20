@@ -1,4 +1,4 @@
-package MyPkg
+package pkg
 
 import (
 	"wucms-gva/server/global"
@@ -32,7 +32,7 @@ type Post struct {
 }
 
 type PostMeta struct {
-	UmetaId   *int   `gorm:"primarykey"` // 主键ID
+	MetaId    *int   `gorm:"primarykey"` // 主键ID
 	PostId    *int   `json:"post_id" form:"post_id" gorm:"index:post_id;column:post_id;comment:;default:0;"`
 	MetaKey   string `json:"meta_key" form:"meta_key" gorm:"index:meta_key;column:meta_key;comment:;"`
 	MetaValue string `json:"meta_value" form:"meta_value" gorm:"column:meta_value;comment:;"`

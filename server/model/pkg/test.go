@@ -1,4 +1,4 @@
-package MyPkg
+package pkg
 
 // type User struct {
 // 	gorm.Model

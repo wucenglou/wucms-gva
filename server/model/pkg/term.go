@@ -1,4 +1,4 @@
-package MyPkg
+package pkg
 
 import (
 	"time"
@@ -14,7 +14,7 @@ type Term struct {
 	TermGroup    *int         `json:"term_group" form:"term_group" gorm:"column:term_group;comment:;"`
 	TermTaxonomy TermTaxonomy `gorm:"foreignKey:TermId;"`
 
-	TermMeta []TermMeta
+	TermMeta []TermMeta `json:"termmeta" gorm:"foreignKey:TermId;references:TermId;"`
 }
 
 // TermStruct 结构体
@@ -39,7 +39,7 @@ type TermRelationship struct {
 }
 
 type TermMeta struct {
-	UmetaId   *int   `gorm:"primarykey"` // 主键ID
+	MetaId    *int   `gorm:"primarykey"` // 主键ID
 	TermId    *int   `json:"term_id" form:"term_id" gorm:"index:term_id;column:term_id;comment:;default:0;"`
 	MetaKey   string `json:"meta_key" form:"meta_key" gorm:"index:meta_key;column:meta_key;comment:;"`
 	MetaValue string `json:"meta_value" form:"meta_value" gorm:"column:meta_value;comment:;"`

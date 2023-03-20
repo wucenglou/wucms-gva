@@ -1,4 +1,4 @@
-package MyPkg
+package pkg
 
 import (
 	"wucms-gva/server/global"
