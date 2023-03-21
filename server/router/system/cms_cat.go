@@ -8,7 +8,7 @@ import (
 
 type CmsCatRouter struct{}
 
-func (s *CmsCatRouter) InitApiRouter(Router *gin.RouterGroup) {
+func (s *CmsCatRouter) InitCmsCatRouter(Router *gin.RouterGroup) {
 	// apiRouter := Router.Group("cat").Use(middleware.OperationRecord())
 	apiRouterWithoutRecord := Router.Group("cat")
 	CmsCatApi := v1.ApiGroupApp.SystemApiGroup.CmsCatApi
@@ -20,7 +20,9 @@ func (s *CmsCatRouter) InitApiRouter(Router *gin.RouterGroup) {
 		// apiRouter.DELETE("deleteApisByIds", apiRouterApi.DeleteApisByIds) // 删除选中api
 	}
 	{
-		apiRouterWithoutRecord.POST("cattest", CmsCatApi.CatTest) // 获取所有api
+		apiRouterWithoutRecord.GET("", CmsCatApi.GetCmsCat)
+		apiRouterWithoutRecord.POST("cattest", CmsCatApi.CatTest)  // 获取所有api
+		apiRouterWithoutRecord.POST("create", CmsCatApi.CreateCat) // 获取所有api
 		// apiRouterWithoutRecord.POST("getApiList", apiRouterApi.GetApiList) // 获取Api列表
 	}
 }

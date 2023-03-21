@@ -15,4 +15,6 @@ type RouterGroup struct {
 	OperationRecordRouter
 	DictionaryDetailRouter
 	AuthorityBtnRouter
+
+	CmsCatRouter
 }

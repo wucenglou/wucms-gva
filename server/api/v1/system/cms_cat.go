@@ -1,12 +1,31 @@
 package system
 
 import (
+	"fmt"
+	"wucms-gva/server/global"
 	"wucms-gva/server/model/common/response"
+	"wucms-gva/server/model/pkg"
 
 	"github.com/gin-gonic/gin"
 )
 
 type CmsCatApi struct{}
+
+func (catApi *CmsCatApi) GetCmsCat(c *gin.Context) {
+	var Term []pkg.Term
+	err := global.GVA_DB.Model(&pkg.Term{}).Preload("TermMetas").Preload("TermTaxonomy.Children").Find(&Term).Error
+	if err != nil {
+		response.FailWithMessage(err.Error(), c)
+		return
+	}
+	var TermTaxonomy []pkg.TermTaxonomy
+	err = global.GVA_DB.Model(&pkg.TermTaxonomy{}).Preload("Children").Where("parent_id = 0").Find(&TermTaxonomy).Error
+	if err != nil {
+		response.FailWithMessage(err.Error(), c)
+		return
+	}
+	response.OkWithDetailed(gin.H{"term": Term, "termtaxonomy": TermTaxonomy}, "查询成功", c)
+}
 
 func (catApi *CmsCatApi) CatTest(c *gin.Context) {
 	// var term MyPkg.Term
@@ -28,21 +47,31 @@ func (catApi *CmsCatApi) CatTest(c *gin.Context) {
 // @Param data body MyPkg.TermStruct true "创建TermStruct"
 // @Success 200 {string} string "{"success":true,"data":{},"msg":"获取成功"}"
 // @Router /term/createTermStruct [post]
-// func (catApi *CmsCatApi) CreateCat(c *gin.Context) {
-// 	var TermTaxonomy MyPkg.TermTaxonomy
-// 	err := c.ShouldBindJSON(&TermTaxonomy)
-// 	if err != nil {
-// 		response.FailWithMessage(err.Error(), c)
-// 		return
-// 	}
-// 	response.OkWithMessage("创建成功", c)
-// 	if err := termService.CreateTermStruct(term); err != nil {
-// 		global.GVA_LOG.Error("创建失败!", zap.Error(err))
-// 		response.FailWithMessage("创建失败", c)
-// 	} else {
-// 		response.OkWithMessage("创建成功", c)
-// 	}
-// }
+func (catApi *CmsCatApi) CreateCat(c *gin.Context) {
+	fmt.Println("---------c1111111at+++++++++++")
+	var Term pkg.Term
+	fmt.Println("---------cat+++++++++++")
+	err := c.ShouldBindJSON(&Term)
+	fmt.Println(Term)
+	if err != nil {
+		response.FailWithMessage(err.Error(), c)
+		return
+	}
+	err = global.GVA_DB.Create(&Term).Error
+	if err != nil {
+		response.FailWithMessage(err.Error(), c)
+		return
+	}
+	fmt.Println("***************------------")
+	fmt.Println(Term)
+	response.OkWithMessage("创建成功", c)
+	// if err := termService.CreateTermStruct(term); err != nil {
+	// 	global.GVA_LOG.Error("创建失败!", zap.Error(err))
+	// 	response.FailWithMessage("创建失败", c)
+	// } else {
+	// 	response.OkWithMessage("创建成功", c)
+	// }
+}
 
 // DeleteTermStruct 删除TermStruct
 // @Tags TermStruct
