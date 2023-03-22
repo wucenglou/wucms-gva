@@ -21,8 +21,8 @@ func (s *CmsCatRouter) InitCmsCatRouter(Router *gin.RouterGroup) {
 	}
 	{
 		apiRouterWithoutRecord.GET("", CmsCatApi.GetCmsCat)
-		apiRouterWithoutRecord.POST("cattest", CmsCatApi.CatTest)  // 获取所有api
-		apiRouterWithoutRecord.POST("create", CmsCatApi.CreateCat) // 获取所有api
+		apiRouterWithoutRecord.POST("cattest", CmsCatApi.CatTest) // 获取所有api
+		apiRouterWithoutRecord.POST("", CmsCatApi.CreateCmsCat)   // 获取所有api
 		// apiRouterWithoutRecord.POST("getApiList", apiRouterApi.GetApiList) // 获取Api列表
 	}
 }

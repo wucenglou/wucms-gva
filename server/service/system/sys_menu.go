@@ -159,6 +159,8 @@ func (menuService *MenuService) getMenuTreeMap(authorityId uint) (treeMap map[st
 // @return: menus []system.SysBaseMenu, err error
 func (menuService *MenuService) GetBaseMenuTree() (menus []system.SysBaseMenu, err error) {
 	treeMap, err := menuService.getBaseMenuTreeMap()
+	// fmt.Println("********************++++++")
+	// fmt.Println(treeMap)
 	menus = treeMap["0"]
 	for i := 0; i < len(menus); i++ {
 		err = menuService.getBaseChildrenList(&menus[i], treeMap)

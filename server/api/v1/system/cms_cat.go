@@ -13,18 +13,59 @@ type CmsCatApi struct{}
 
 func (catApi *CmsCatApi) GetCmsCat(c *gin.Context) {
 	var Term []pkg.Term
-	err := global.GVA_DB.Model(&pkg.Term{}).Preload("TermMetas").Preload("TermTaxonomy.Children").Find(&Term).Error
+	err := global.GVA_DB.Model(&pkg.Term{}).Preload("TermMetas").Preload("TermTaxonomy").Find(&Term).Error
 	if err != nil {
 		response.FailWithMessage(err.Error(), c)
 		return
 	}
-	var TermTaxonomy []pkg.TermTaxonomy
-	err = global.GVA_DB.Model(&pkg.TermTaxonomy{}).Preload("Children").Where("parent_id = 0").Find(&TermTaxonomy).Error
+	fmt.Println("********************")
+
+	// var pageInfo request.PageInfo
+	// err := c.ShouldBindJSON(&pageInfo)
+	// if err != nil {
+	// 	response.FailWithMessage(err.Error(), c)
+	// 	return
+	// }
+	var TermTaxonomy []*pkg.TermTaxonomy
+	err = global.GVA_DB.Model(&pkg.TermTaxonomy{}).Preload("Term").Find(&TermTaxonomy).Error
 	if err != nil {
 		response.FailWithMessage(err.Error(), c)
 		return
 	}
-	response.OkWithDetailed(gin.H{"term": Term, "termtaxonomy": TermTaxonomy}, "查询成功", c)
+	cat := catApi.BuildCmsCatTree(TermTaxonomy, 0)
+	response.OkWithDetailed(gin.H{"list": cat, "Term": Term}, "查询成功", c)
+}
+
+func (catApi *CmsCatApi) BuildCmsCatTree(items []*pkg.TermTaxonomy, parentId int) []*pkg.TermTaxonomy {
+	result := []*pkg.TermTaxonomy{}
+	for _, item := range items {
+		if item.ParentID == parentId {
+			// itemitem.Term.Name
+			item.Children = catApi.BuildCmsCatTree(items, int(item.TermTaxonomyId))
+			result = append(result, item)
+		}
+	}
+	return result
+}
+
+func (catApi *CmsCatApi) CreateCmsCat(c *gin.Context) {
+	fmt.Println("---------c1111111at+++++++++++")
+	var Term pkg.Term
+	fmt.Println("---------cat+++++++++++")
+	err := c.ShouldBindJSON(&Term)
+	fmt.Println(Term)
+	if err != nil {
+		response.FailWithMessage(err.Error(), c)
+		return
+	}
+	err = global.GVA_DB.Create(&Term).Error
+	if err != nil {
+		response.FailWithMessage(err.Error(), c)
+		return
+	}
+	fmt.Println("***************------------")
+	fmt.Println(Term)
+	response.OkWithMessage("创建成功", c)
 }
 
 func (catApi *CmsCatApi) CatTest(c *gin.Context) {
