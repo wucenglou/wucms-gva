@@ -20,6 +20,10 @@ func (s *CmsCatRouter) InitCmsCatRouter(Router *gin.RouterGroup) {
 		// apiRouter.DELETE("deleteApisByIds", apiRouterApi.DeleteApisByIds) // 删除选中api
 	}
 	{
+		apiRouterWithoutRecord.DELETE("", CmsCatApi.DeleteCmsCat)
+		apiRouterWithoutRecord.DELETE("ByIds", CmsCatApi.DeleteCmsCatByIds)
+		apiRouterWithoutRecord.PUT("", CmsCatApi.UpdateCmsCat)
+		apiRouterWithoutRecord.GET("ById", CmsCatApi.FindCmsCat)
 		apiRouterWithoutRecord.GET("", CmsCatApi.GetCmsCat)
 		apiRouterWithoutRecord.POST("cattest", CmsCatApi.CatTest) // 获取所有api
 		apiRouterWithoutRecord.POST("", CmsCatApi.CreateCmsCat)   // 获取所有api

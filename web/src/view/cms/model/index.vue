@@ -31,8 +31,8 @@
             <el-table style="width: 100%" tooltip-effect="dark" default-expand-all :data="tableData" row-key="term_id"
                 @selection-change="handleSelectionChange">
                 <el-table-column type="selection" width="55" />
-                <el-table-column align="left" label="名称" prop="Term.name" width="120" />
-                <el-table-column align="left" label="别名" prop="Term.slug" width="120" />
+                <el-table-column align="left" label="模型名称" prop="Term.name" width="120" />
+                <el-table-column align="left" label="模型别名(英文)" prop="Term.slug" width="120" />
                 <el-table-column align="left" label="描述" prop="description" show-overflow-tooltip width="320" />
                 <el-table-column align="left" label="总数" prop="count" width="120" />
                 <el-table-column align="left" label="对象分组" prop="Term.term_group" width="120" />
@@ -160,7 +160,7 @@ const handleCurrentChange = (val) => {
 const catOption = ref([])
 const getTableData = async () => {
     console.log("调用一次")
-    let arr = []
+    searchInfo.value.model = "cat"
     const table = await getCmsCatList({ page: page.value, pageSize: pageSize.value, ...searchInfo.value })
     if (table.code === 0) {
         handleName(table.data.list)
@@ -241,7 +241,7 @@ const onDelete = async () => {
         multipleSelection.value.map(item => {
             ids.push(item.term_id)
         })
-        console.log("-------------")
+    console.log("-------------")
     console.log(ids)
     const res = await deleteCmsCatByIds({ ids })
     if (res.code === 0) {
