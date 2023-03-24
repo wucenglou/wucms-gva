@@ -104,6 +104,10 @@ import {
 import { getDictFunc, formatDate, formatBoolean, filterDict } from '@/utils/format'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { ref, reactive } from 'vue'
+import { useRoute } from 'vue-router';
+
+const route = useRoute()
+
 
 // 自动化生成的字典（可能为空）以及字段
 const formData = ref({
@@ -111,7 +115,7 @@ const formData = ref({
     slug: '',
     term_group: 0,
     term_taxonomy: {
-        "taxonomy": "cat",
+        "taxonomy": "",
         "description": "",
         "parent_id": 0
     }
@@ -160,7 +164,7 @@ const handleCurrentChange = (val) => {
 const catOption = ref([])
 const getTableData = async () => {
     console.log("调用一次")
-    searchInfo.value.model = "cat"
+    searchInfo.value.model = route.params.model
     const table = await getCmsCatList({ page: page.value, pageSize: pageSize.value, ...searchInfo.value })
     if (table.code === 0) {
         handleName(table.data.list)
@@ -319,7 +323,7 @@ const enterDialog = async () => {
         switch (type.value) {
             case 'create':
                 console.log(formData.value)
-                formData.value.term_taxonomy.taxonomy = "cat"
+                formData.value.term_taxonomy.taxonomy = route.params.model
                 res = await createCmsCat(formData.value)
                 break
             case 'update':

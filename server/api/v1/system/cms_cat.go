@@ -16,26 +16,22 @@ import (
 type CmsCatApi struct{}
 
 func (catApi *CmsCatApi) GetCmsCat(c *gin.Context) {
-	var pageInfo request.PageInfo
-	err := c.ShouldBindJSON(&pageInfo)
+	var pageInfo request.ModelPageInfo
+	err := c.ShouldBindQuery(&pageInfo)
 	if err != nil {
 		response.FailWithMessage(err.Error(), c)
 		return
 	}
+	fmt.Println("9999999999999")
+	fmt.Println(pageInfo)
 	var Term []pkg.Term
-	err = global.GVA_DB.Model(&pkg.Term{}).Preload("TermMetas").Preload("TermTaxonomy").Find(&Term).Error
+	err = global.GVA_DB.Model(&pkg.Term{}).Preload("TermMetas").Preload("TermTaxonomy", "taxonomy = ?", pageInfo.Model).Find(&Term).Error
 	if err != nil {
 		response.FailWithMessage(err.Error(), c)
 		return
 	}
-	// var pageInfo request.PageInfo
-	// err := c.ShouldBindJSON(&pageInfo)
-	// if err != nil {
-	// 	response.FailWithMessage(err.Error(), c)
-	// 	return
-	// }
 	var TermTaxonomy []*pkg.TermTaxonomy
-	err = global.GVA_DB.Model(&pkg.TermTaxonomy{}).Preload("Term").Find(&TermTaxonomy).Error
+	err = global.GVA_DB.Model(&pkg.TermTaxonomy{}).Not("parent_id = ? AND taxonomy <> ?", 0, pageInfo.Model).Preload("Term").Find(&TermTaxonomy).Error
 	if err != nil {
 		response.FailWithMessage(err.Error(), c)
 		return
