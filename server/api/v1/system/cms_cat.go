@@ -31,7 +31,8 @@ func (catApi *CmsCatApi) GetCmsCat(c *gin.Context) {
 		return
 	}
 	var TermTaxonomy []*pkg.TermTaxonomy
-	err = global.GVA_DB.Model(&pkg.TermTaxonomy{}).Not("parent_id = ? AND taxonomy <> ?", 0, pageInfo.Model).Preload("Term").Find(&TermTaxonomy).Error
+	// err = global.GVA_DB.Model(&pkg.TermTaxonomy{}).Not("parent_id = ? AND taxonomy <> ?", 0, pageInfo.Model).Preload("Term").Find(&TermTaxonomy).Error
+	err = global.GVA_DB.Model(&pkg.TermTaxonomy{}).Where("taxonomy = ?", pageInfo.Model).Preload("Term").Find(&TermTaxonomy).Error
 	if err != nil {
 		response.FailWithMessage(err.Error(), c)
 		return
@@ -98,9 +99,12 @@ func (catApi *CmsCatApi) DeleteCmsCat(c *gin.Context) {
 		response.FailWithMessage(err.Error(), c)
 		return
 	}
-	// var Term pkg.Term
-	fmt.Println("+++++++++++")
-	fmt.Println(request.ID)
+	var termTaxonomy pkg.TermTaxonomy
+	err = global.GVA_DB.Where("parent_id = ?", request.ID).First(&termTaxonomy).Error
+	if err == nil {
+		response.FailWithMessage("先删除子目录", c)
+		return
+	}
 	err = global.GVA_DB.Select(clause.Associations).Delete(&pkg.Term{TermId: uint(request.ID)}).Error
 	if err != nil {
 		response.FailWithMessage(err.Error(), c)

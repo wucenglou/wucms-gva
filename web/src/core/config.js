@@ -3,7 +3,8 @@
  */
 
 const config = {
-  appName: 'Gin-Vue-Admin',
+  appName: 'wucms-gva',
+  // appName: 'Gin-Vue-Admin',
   appLogo: 'https://www.gin-vue-admin.com/img/logo.png',
   showViteLogo: true
 }

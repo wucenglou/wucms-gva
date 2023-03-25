@@ -1,48 +1,105 @@
 <template>
     <div>
-        <div class="big">
-            <div class="inner">
-                <img src="../../../assets/notFound.png">
-                <p>new 页面被神秘力量吸走了 99999999999（如果您是开源版请联系我们修复）</p>
-                <p style="font-size:18px;line-height:40px;">常见问题为当前此角色无当前路由，如果确定要使用本路由，请到角色管理进行分配</p>
-                <p>↓</p>
-                <img src="../../../assets/qm.png" class="leftPic">
-            </div>
+        <div class="gva-search-box">
+
+            <el-form ref="Form" :model="form" :rules="rules" label-width="4em">
+
+
+                <el-form-item label="标题" prop="title">
+                    <el-input v-model="form.title"></el-input>
+                </el-form-item>
+                <el-form-item label="关键词" prop="keywords">
+                    <el-input v-model="form.keywords"></el-input>
+                </el-form-item>
+                <el-form-item label="摘要" prop="description">
+                    <el-input v-model="form.description" type="textarea"></el-input>
+                </el-form-item>
+                <!-- <el-form-item label="权重">
+                    <el-input-number v-model="form.sort" :precision="2" :step="0.01" :max="10" />
+                </el-form-item>
+                <el-form-item label="状态" prop="status">
+                    <el-radio-group v-model="form.status">
+                        <el-radio label="1">已发布</el-radio>
+                        <el-radio label="2">待审核</el-radio>
+                        <el-radio label="3">未通过</el-radio>
+                        <el-radio label="4">已废弃</el-radio>
+                    </el-radio-group>
+                </el-form-item> -->
+                <el-row :gutter="24">
+                    <el-col :xs="24" :sm="12">
+                        <el-form-item label="权重">
+                            <el-input-number v-model="form.sort" :precision="2" :step="0.01" :max="10" />
+                        </el-form-item>
+
+                    </el-col>
+                    <el-col :xs="24" :sm="12">
+                        <el-form-item label="状态" prop="status">
+                            <el-radio-group v-model="form.status">
+                                <el-radio label="1">已发布</el-radio>
+                                <el-radio label="2">待审核</el-radio>
+                                <el-radio label="3">未通过</el-radio>
+                                <el-radio label="4">已废弃</el-radio>
+                            </el-radio-group>
+                        </el-form-item>
+
+                    </el-col>
+                </el-row>
+                <!-- 
+                <el-row>
+                    <el-col :span="12">
+                        <el-form-item label="权重">
+                            <el-input-number v-model="form.sort" :precision="2" :step="0.01" :max="10" />
+                        </el-form-item>
+
+                    </el-col>
+                    <el-col :span="12">
+                        <el-form-item label="状态" prop="status">
+                            <el-radio-group v-model="form.status">
+                                <el-radio label="1">已发布</el-radio>
+                                <el-radio label="2">待审核</el-radio>
+                                <el-radio label="3">未通过</el-radio>
+                                <el-radio label="4">已废弃</el-radio>
+                            </el-radio-group>
+                        </el-form-item>
+                    </el-col>
+                </el-row> -->
+                <!-- <el-form-item> -->
+                <div id="text" style="width: 100%">
+                    <editor v-model="form.content" />
+                </div>
+                <!-- </el-form-item> -->
+
+                <div style="margin: 2rem;">
+                    <el-button>取消</el-button>
+                    <el-button type="primary" @click="onSubmit('create')">提交</el-button>
+                </div>
+            </el-form>
         </div>
     </div>
 </template>
 
 <script>
 export default {
-    name: 'Error'
-
+    name: 'Edit',
 }
 </script>
 
-<style lang="scss">
-.big {
-    width: 100%;
-    height: calc(100vh - 220px);
-    background-color: rgb(244, 244, 244);
-    position: relative;
-}
-
-.inner {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-}
-
-.inner p {
-    text-align: center;
-    font-size: 24px;
-}
-
-.inner .leftPic {
-    width: 60px;
-    height: 60px;
-    margin-left: 44%;
-    margin-top: 20px;
-}
-</style>
+<script setup>
+import { ref, reactive, onMounted } from 'vue'
+import editor from "@/components/Editor/index.vue"
+const form = ref({
+    catId: '',
+    user_id: '',
+    // modeId: '',
+    title: '标题',
+    status: '1',
+    keywords: '',
+    description: '',
+    content: "",
+    // flag: [],
+    // type: [],
+    picList: [],
+    sort: 0,
+    // page_views: '',
+})
+</script>

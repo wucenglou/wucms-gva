@@ -103,11 +103,12 @@ import {
 // 全量引入格式化工具 请按需保留
 import { getDictFunc, formatDate, formatBoolean, filterDict } from '@/utils/format'
 import { ElMessage, ElMessageBox } from 'element-plus'
-import { ref, reactive } from 'vue'
+import { ref, reactive, watch, onActivated, onDeactivated } from 'vue'
 import { useRoute } from 'vue-router';
 
 const route = useRoute()
 
+console.log("99999999999999999999")
 // 自动化生成的字典（可能为空）以及字段
 const formData = ref({
     name: '',
@@ -158,6 +159,25 @@ const handleCurrentChange = (val) => {
     page.value = val
     // getTableData()
 }
+
+watch(
+    () => route.params,
+    (a, n) => {
+        if (a.model) {
+            console.log("此为模块")
+            getTableData()
+        }
+    }
+)
+watch(
+    () => route.path,
+    (a, n) => {
+        if (a.model) {
+            console.log("此为模块")
+            getTableData()
+        }
+    }
+)
 
 // 查询
 const catOption = ref([])
@@ -344,6 +364,7 @@ const enterDialog = async () => {
         }
     })
 }
+
 </script>
 
 <style></style>
