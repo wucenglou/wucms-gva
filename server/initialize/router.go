@@ -77,6 +77,8 @@ func Routers() *gin.Engine {
 
 		systemRouter.InitCmsCatRouter(PrivateGroup)
 
+		pkgRouter.InitPostRouter(PrivateGroup)
+
 		exampleRouter.InitFileUploadAndDownloadRouter(PrivateGroup) // 文件上传下载功能路由
 	}
 

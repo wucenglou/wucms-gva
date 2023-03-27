@@ -1,5 +1,6 @@
 <template>
     <div>
+        <warning-bar title="注：模型最多三级，模型的别名必须为model，模块最多两级，为了提升查询性能，模块要先注册，才能在编辑器里面显示" />
         <!-- <div class="gva-search-box">
             <el-form :inline="true" :model="searchInfo" class="demo-form-inline" @keyup.enter="onSubmit">
                 <el-form-item label="创建时间">
@@ -22,10 +23,10 @@
                         <el-button size="small" type="primary" link @click="deleteVisible = false">取消</el-button>
                         <el-button size="small" type="primary" @click="onDelete">确定</el-button>
                     </div>
-                    <template #reference>
+                    <!-- <template #reference>
                         <el-button icon="delete" size="small" style="margin-left: 10px;"
                             :disabled="!multipleSelection.length" @click="deleteVisible = true">删除</el-button>
-                    </template>
+                    </template> -->
                 </el-popover>
             </div>
             <el-table style="width: 100%" tooltip-effect="dark" default-expand-all :data="tableData" row-key="term_id"
@@ -33,7 +34,7 @@
                 <el-table-column type="selection" width="55" />
                 <el-table-column align="left" label="模型名称" prop="Term.name" width="120" />
                 <el-table-column align="left" label="模型别名(英文)" prop="Term.slug" width="120" />
-                <el-table-column align="left" label="描述" prop="description" show-overflow-tooltip width="320" />
+                <el-table-column align="left" label="描述" prop="description" show-overflow-tooltip width="460" />
                 <el-table-column align="left" label="总数" prop="count" width="120" />
                 <el-table-column align="left" label="对象分组" prop="Term.term_group" width="120" />
                 <el-table-column align="left" label="按钮组">
@@ -51,7 +52,7 @@
                     @size-change="handleSizeChange" />
             </div> -->
         </div>
-        <el-dialog v-model="dialogFormVisible" :before-close="closeDialog" title="添加分类">
+        <el-dialog v-model="dialogFormVisible" :before-close="closeDialog" :title="dialog_title.title">
             <el-form :model="formData" label-position="right" ref="elFormRef" :rules="rule" label-width="80px">
 
                 <el-form-item label="上级栏目">
@@ -99,7 +100,7 @@ import {
     findCmsCat,
     getCmsCatList
 } from '@/api/cms'
-
+import WarningBar from '@/components/warningBar/warningBar.vue'
 // 全量引入格式化工具 请按需保留
 import { getDictFunc, formatDate, formatBoolean, filterDict } from '@/utils/format'
 import { ElMessage, ElMessageBox } from 'element-plus'
@@ -119,6 +120,9 @@ const formData = ref({
         "description": "",
         "parent_id": 0
     }
+})
+const dialog_title = ref({
+    "title":"添加分类"
 })
 
 // 验证规则
@@ -270,6 +274,7 @@ const updateTermStructFunc = async (row) => {
     console.log(row)
     const res = await findCmsCat({ id: row.term_id })
     type.value = 'update'
+    dialog_title.value.title = "更新"
     if (res.code === 0) {
         formData.value = res.data.term
         dialogFormVisible.value = true

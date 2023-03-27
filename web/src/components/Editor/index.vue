@@ -20,7 +20,7 @@ import 'tinymce/plugins/charmap'
 import 'tinymce/plugins/code'
 import 'tinymce/plugins/codesample'
 import 'tinymce/plugins/directionality'
-import 'tinymce/plugins/emoticons'
+// import 'tinymce/plugins/emoticons'
 import 'tinymce/plugins/fullscreen'
 import 'tinymce/plugins/help'
 import 'tinymce/plugins/image'
@@ -39,6 +39,12 @@ import 'tinymce/plugins/table'
 import 'tinymce/plugins/visualblocks'
 import 'tinymce/plugins/visualchars'
 import 'tinymce/plugins/wordcount'
+import 'tinymce/plugins/print'
+import 'tinymce/plugins/template'
+import 'tinymce/plugins/hr'
+import 'tinymce/plugins/imagetools'
+import 'tinymce/plugins/textpattern'
+
 
 import { upload } from '@/api/upload'
 // import useSettingsStore from '@/store/modules/settings'
@@ -70,6 +76,11 @@ const defaultSetting = ref({
     min_height: 450,
     max_height: 600,
     selector: '#text textarea',
+    external_plugins: {
+        'importword': 'tinymce/plugins/importword/plugin.min.js',
+        'indent2em': 'tinymce/plugins/indent2em/plugin.min.js',
+        'emoticons': 'tinymce/plugins/emoticons/plugin.min.js',
+    },
     // menu: {
     //     file: { title: '文件', items: 'newdocument print' },
     //     edit: { title: '编辑', items: 'undo redo | cut copy paste pastetext | selectall' },
@@ -80,8 +91,10 @@ const defaultSetting = ref({
     //     tools: { title: '工具', items: 'spellchecker code' }
     // },
     font_formats: '微软雅黑=Microsoft YaHei,Helvetica Neue,PingFang SC,sans-serif;苹果苹方=PingFang SC,Microsoft YaHei,sans-serif;宋体=simsun,serif',
-    plugins: 'print preview searchreplace autolink directionality visualblocks visualchars fullscreen image link media template advcode codesample table charmap hr pagebreak nonbreaking anchor insertdatetime advlist lists wordcount imagetools textpattern help emoticons autosave bdmap indent2em autoresize formatpainter axupimgs importword kityformula-editor',
-    toolbar: 'undo redo | blocks | bold italic underline strikethrough blockquote | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | forecolor backcolor removeformat | link image media table insertdatetime searchreplace | preview code help fullscreen',
+    plugins: 'importword print preview searchreplace autolink directionality visualblocks visualchars fullscreen image link media template codesample table charmap hr pagebreak nonbreaking anchor insertdatetime advlist lists wordcount imagetools textpattern help emoticons autosave bdmap autoresize importword',
+    toolbar: 'code undo redo | forecolor backcolor bold italic underline strikethrough link anchor | alignleft aligncenter alignright indent2em lineheight | \
+                    formatselect fontselect fontsizeselect | bullist numlist | blockquote subscript superscript removeformat | \
+                    table image media bdmap emoticons charmap hr pagebreak insertdatetime importword| fullscreen ',
     branding: false,
     // menubar: 'file edit insert view format table tools help',
     toolbar_mode: 'sliding',
@@ -132,6 +145,6 @@ onMounted(() => {
 
 <style lang="scss" scoped>
 :deep(.tox-tinymce) {
-    border-radius: 4px;
+    border-radius: 10px;
 }
 </style>
