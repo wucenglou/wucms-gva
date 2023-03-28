@@ -10,6 +10,7 @@ import TinymceEditor from '@tinymce/tinymce-vue'
 import 'tinymce/themes/silver/theme'
 import 'tinymce/icons/default/icons'
 // import 'tinymce/models/dom'
+// import "tinymce-plugin"
 
 import 'tinymce/plugins/advlist'
 import 'tinymce/plugins/anchor'
@@ -73,13 +74,15 @@ const defaultSetting = ref({
     language: 'zh-Hans',
     skin_url: 'tinymce/skins/ui/oxide',
     content_css: 'tinymce/skins/content/default/content.min.css',
-    min_height: 450,
-    max_height: 600,
+    min_height: 650,
+    max_height: 800,
+    skeletonScreen: true,
     selector: '#text textarea',
     external_plugins: {
         'importword': 'tinymce/plugins/importword/plugin.min.js',
         'indent2em': 'tinymce/plugins/indent2em/plugin.min.js',
         'emoticons': 'tinymce/plugins/emoticons/plugin.min.js',
+        'bdmap': 'tinymce/plugins/bdmap/plugin.min.js'
     },
     // menu: {
     //     file: { title: '文件', items: 'newdocument print' },

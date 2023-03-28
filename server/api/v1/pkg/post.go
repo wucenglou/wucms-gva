@@ -1,11 +1,12 @@
 package pkg
 
 import (
-	"fmt"
 	"wucms-gva/server/global"
 	"wucms-gva/server/model/common/request"
 	"wucms-gva/server/model/common/response"
 	"wucms-gva/server/model/pkg"
+	req "wucms-gva/server/model/pkg/request"
+	"wucms-gva/server/utils"
 
 	"github.com/gin-gonic/gin"
 	"go.uber.org/zap"
@@ -14,21 +15,39 @@ import (
 type Post struct{}
 
 func (post *Post) CreatePost(c *gin.Context) {
-	var Post pkg.Post
-	err := c.ShouldBindJSON(&Post)
-	fmt.Println("***************------------")
-	fmt.Println(Post)
+	var reqPost req.ReqPost
+	err := c.ShouldBindJSON(&reqPost)
 	if err != nil {
 		response.FailWithMessage(err.Error(), c)
 		return
 	}
-	err = global.GVA_DB.Create(&Post).Error
+	user, _ := utils.GetUser(c)
+	var Tem pkg.Post
+	Tem.PostAuthor = user.ID
+	reqPost.Post.PostAuthor = Tem.PostAuthor
+	err = global.GVA_DB.Create(&reqPost.Post).Error
 	if err != nil {
 		response.FailWithMessage(err.Error(), c)
 		return
 	}
-	fmt.Println("***************------------")
-	// fmt.Println(Post)
+	var termTaxonomy []pkg.TermTaxonomy
+	for _, v := range reqPost.TermIds {
+		t := pkg.TermTaxonomy{TermTaxonomyId: uint(v)}
+		termTaxonomy = append(termTaxonomy, t)
+	}
+	global.GVA_DB.Model(&reqPost.Post).Association("TermTaxonomy").Append(&termTaxonomy)
+	// var Tem pkg.Post
+	// user, _ := utils.GetUser(c)
+	// // fmt.Println("***************")
+	// // fmt.Println(user.ID)
+	// Tem.PostAuthor = user.ID
+	// Post.PostAuthor = Tem.PostAuthor
+	// // fmt.Println(Post)
+	// err = global.GVA_DB.Create(&Post).Association("TermTaxonomy").Error
+	// if err != nil {
+	// 	response.FailWithMessage(err.Error(), c)
+	// 	return
+	// }
 	response.OkWithDetailed(gin.H{}, "创建成功", c)
 }
 
@@ -47,4 +66,14 @@ func (post *Post) FindPost(c *gin.Context) {
 	} else {
 		response.OkWithData(gin.H{"post": Post}, c)
 	}
+}
+
+func (post *Post) GetPostList(c *gin.Context) {
+	var posts []pkg.Post
+	err := global.GVA_DB.Find(&posts).Error
+	if err != nil {
+		response.FailWithMessage(err.Error(), c)
+		return
+	}
+	response.OkWithDetailed(gin.H{"list": posts}, "查询成功", c)
 }

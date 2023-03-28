@@ -7,12 +7,12 @@ import (
 // TermStruct 结构体
 type Post struct {
 	global.GVA_MODEL
-	PostAuthor          *int   `json:"post_author" form:"post_author" gorm:"foreignKey:TermId;index:post_author;column:post_author;comment:文章作者的用户ID;"`
+	PostAuthor          uint   `json:"post_author" form:"post_author" gorm:"foreignKey:TermId;index:post_author;column:post_author;comment:文章作者的用户ID;"`
 	PostTitle           string `json:"post_title" form:"post_title" gorm:"type:text;column:post_title;comment:文章标题;"`
 	PostExcerpt         string `json:"post_excerpt" form:"post_excerpt" gorm:"type:text;column:post_excerpt;comment:文章摘要;"`
 	PostContent         string `json:"post_content" form:"post_content" gorm:"type:longtext;column:post_content;comment:文章内容;"`
 	PostContentFiltered string `json:"post_content_filtered" form:"post_content_filtered" gorm:"type:longtext;column:post_content_filtered;comment:过滤后的文章内容;"`
-	PostParent          *int   `json:"post_parent" form:"post_parent" gorm:"column:post_parent;comment:父文章的ID;default:0;"`
+	PostParent          uint   `json:"post_parent" form:"post_parent" gorm:"column:post_parent;comment:父文章的ID;default:0;"`
 	PostType            string `json:"post_type" form:"post_type" gorm:"size:20;index:post_type;index:post_status;column:post_type;comment:文章类型;default:'post';"`
 	PostStatus          string `json:"post_status" form:"post_status" gorm:"size:20;index:post_status;column:post_status;comment:;default:'publish';"`
 	PostName            string `json:"post_name" form:"post_name" gorm:"size:200;index:post_name;column:post_name;comment:文章的永久链接（slug）;"`
@@ -25,6 +25,8 @@ type Post struct {
 	CommentCount  *int   `json:"comment_count" form:"comment_count" gorm:"column:comment_count;comment:;default:0;"`
 
 	User User `gorm:"foreignKey:PostAuthor;"`
+
+	TermTaxonomy []TermTaxonomy `json:"term_id" gorm:"many2many:TermRelationships;foreignKey:ID;joinForeignKey:ObjectId;References:TermTaxonomyId;joinReferences:TermTaxonomyId"`
 
 	PostMeta []PostMeta
 

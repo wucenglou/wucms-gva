@@ -24,7 +24,7 @@ func (s *Post) InitPostRouter(Router *gin.RouterGroup) {
 		// apiRouterWithoutRecord.DELETE("ByIds", Post.DeleteCmsCatByIds)
 		// apiRouterWithoutRecord.PUT("", Post.UpdateCmsCat)
 		apiRouterWithoutRecord.GET("ById", Post.FindPost)
-		// apiRouterWithoutRecord.GET("", Post.GetCmsCat)
+		apiRouterWithoutRecord.GET("", Post.GetPostList)
 		// apiRouterWithoutRecord.POST("cattest", Post.CatTest)
 		apiRouterWithoutRecord.POST("", Post.CreatePost)
 		// apiRouterWithoutRecord.POST("getApiList", apiRouterApi.GetApiList) // 获取Api列表

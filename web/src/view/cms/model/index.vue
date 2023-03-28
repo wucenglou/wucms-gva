@@ -32,7 +32,7 @@
             <el-table style="width: 100%" tooltip-effect="dark" default-expand-all :data="tableData" row-key="term_id"
                 @selection-change="handleSelectionChange">
                 <el-table-column type="selection" width="55" />
-                <el-table-column align="left" label="模型名称" prop="Term.name" width="120" />
+                <el-table-column align="left" label="模型名称" prop="Term.name" width="200" />
                 <el-table-column align="left" label="模型别名(英文)" prop="Term.slug" width="120" />
                 <el-table-column align="left" label="描述" prop="description" show-overflow-tooltip width="460" />
                 <el-table-column align="left" label="总数" prop="count" width="120" />

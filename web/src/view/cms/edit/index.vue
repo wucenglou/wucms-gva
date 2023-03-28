@@ -7,7 +7,7 @@
                 <el-form-item label="栏目" prop="term_id">
                     <el-cascader v-model="formData.term_id" placeholder="无" :disabled="dialogType == 'add'"
                         :options="catOption"
-                        :props="{ checkStrictly: true, label: 'name', value: 'TermTaxonomyId', disabled: 'disabled', emitPath: false }"
+                        :props="{ multiple: true,checkStrictly: true, label: 'name', value: 'TermTaxonomyId', disabled: 'disabled', emitPath: false }"
                         :show-all-levels="false" filterable />
                 </el-form-item>
 
@@ -70,9 +70,20 @@
                     </el-col>
                 </el-row> -->
                 <!-- <el-form-item> -->
+                <!-- <el-row :gutter="24">
+                    <el-col :xs="24" :sm="12">
+                        <div id="text" style="border-radius: 1px;">
+                            <editor v-model="formData.post_content" />
+                        </div>
+                    </el-col>
+                    <el-col :xs="24" :sm="12" style="min_height: 450;max_height: 600;padding:10px;border: 2px solid #e9e9e9;border-radius: 10px;">
+                        <span v-html="formData.post_content" ></span>
+                    </el-col>
+                </el-row> -->
                 <div id="text" style="width: 100%;border-radius: 1px;">
                     <editor v-model="formData.post_content" />
                 </div>
+
                 <!-- </el-form-item> -->
 
                 <div style="margin: 2rem;">
@@ -94,20 +105,24 @@ export default {
 import { ref, reactive, onMounted } from 'vue'
 import editor from "@/components/Editor/index.vue"
 import {
-    createCmsCat,
-    updateCmsCat,
-    deleteCmsCat,
-    deleteCmsCatByIds,
-    findCmsCat,
+    createpost,
+    updatepost,
+    deletepost,
+    deletepostByIds,
+    findpost,
+    getpostList
+} from '@/api/cmsPost'
+import {
     getCmsCatList
 } from '@/api/cms'
+
 import { useRoute } from 'vue-router';
 
 const route = useRoute()
 
 
 const formData = ref({
-    term_id: '',
+    term_id: [],
     user_id: '',
     post_title: '标题',
     status: '1',
@@ -133,7 +148,8 @@ console.log(route)
 const catOption = ref([])
 const getModel = async () => {
     console.log("调用一次")
-    searchInfo.value.model = "model"
+    // searchInfo.value.model = "model"
+    searchInfo.value.model = "cat"
     const table = await getCmsCatList({ page: page.value, pageSize: pageSize.value, ...searchInfo.value })
     if (table.code === 0) {
         handleName(table.data.list)
@@ -151,7 +167,7 @@ const getModel = async () => {
         catOption.value.unshift({
             term_id: 0,
             TermTaxonomyId: 0,
-            name: '根目录',
+            name: '未分类',
             term_group: 0,
             term_taxonomy: {
                 "taxonomy": "cat",
@@ -177,15 +193,17 @@ const handleName = (list) => {
 }
 
 const onSubmit = async () => {
+    let res
     switch (type.value) {
         case 'create':
             console.log(formData.value)
             // formData.value.term_taxonomy.taxonomy = route.params.model
-            // res = await createCmsCat(formData.value)
+            res = await createpost(formData.value)
+            console.log(res)
             break
         case 'update':
             console.log(formData.value)
-            // res = await updateCmsCat(formData.value)
+            // res = await updatepost(formData.value)
             break
         default:
             console.log(formData.value)

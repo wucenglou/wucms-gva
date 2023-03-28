@@ -43,12 +43,16 @@ func (catApi *CmsCatApi) GetCmsCat(c *gin.Context) {
 	}
 	var TermTaxonomy []*pkg.TermTaxonomy
 	// err = global.GVA_DB.Model(&pkg.TermTaxonomy{}).Not("parent_id = ? AND taxonomy <> ?", 0, pageInfo.Model).Preload("Term").Find(&TermTaxonomy).Error
-	err = global.GVA_DB.Model(&pkg.TermTaxonomy{}).Where("taxonomy = ?", pageInfo.Model).Preload("Term").Find(&TermTaxonomy).Error
+	err = global.GVA_DB.Model(&pkg.TermTaxonomy{}).Where("taxonomy = ?", pageInfo.Model).Preload("Term.TermMetas").Find(&TermTaxonomy).Error
 	if err != nil {
 		response.FailWithMessage(err.Error(), c)
 		return
 	}
-	cat := catApi.BuildCmsCatTree(TermTaxonomy, 0, 0, 0)
+	endlevel := 0
+	if pageInfo.Model == "model" {
+		endlevel = 0
+	}
+	cat := catApi.BuildCmsCatTree(TermTaxonomy, 0, 0, endlevel)
 	response.OkWithDetailed(gin.H{"list": cat, "Term": Term}, "查询成功", c)
 }
 
@@ -56,8 +60,20 @@ func (catApi *CmsCatApi) BuildCmsCatTree(items []*pkg.TermTaxonomy, parentId int
 	result := []*pkg.TermTaxonomy{}
 	for _, item := range items {
 		if item.ParentID == parentId {
-			item.Children = catApi.BuildCmsCatTree(items, int(item.TermTaxonomyId), level, endlevel)
-			result = append(result, item)
+			if endlevel == 0 {
+				item.Children = catApi.BuildCmsCatTree(items, int(item.TermTaxonomyId), level, endlevel)
+				result = append(result, item)
+			} else {
+				if level < endlevel {
+					item.Children = catApi.BuildCmsCatTree(items, int(item.TermTaxonomyId), level+1, endlevel)
+					result = append(result, item)
+				} else {
+					// item.Children = catApi.BuildCmsCatTree(items, int(item.TermTaxonomyId), level, endlevel)
+					result = append(result, item)
+				}
+			}
+			// item.Children = catApi.BuildCmsCatTree(items, int(item.TermTaxonomyId), level, endlevel)
+			// result = append(result, item)
 		}
 	}
 	return result
