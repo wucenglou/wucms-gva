@@ -31,6 +31,7 @@
             <el-table style="width: 100%" tooltip-effect="dark" default-expand-all :data="tableData" row-key="term_id"
                 @selection-change="handleSelectionChange">
                 <el-table-column type="selection" width="55" />
+                <el-table-column align="left" label="ID" prop="Term.term_id" width="120" />
                 <el-table-column align="left" label="名称" prop="Term.name" width="120" />
                 <el-table-column align="left" label="别名" prop="Term.slug" width="120" />
                 <el-table-column align="left" label="描述" prop="description" show-overflow-tooltip width="320" />
@@ -70,6 +71,21 @@
                     <el-input v-model="formData.term_taxonomy.description" type="textarea" :clearable="true"
                         placeholder="请输入" />
                 </el-form-item>
+                <el-form-item label="图标" label-width="80px">
+                    <div style="display:inline-block" @click="openHeaderChange1">
+                        <img v-if="formData.term_taxonomy.headerImg" alt="图标" class="header-img-box"
+                            :src="(formData.term_taxonomy.headerImg && formData.term_taxonomy.headerImg.slice(0, 4) !== 'http') ? path + formData.term_taxonomy.headerImg : formData.term_taxonomy.headerImg">
+                        <div v-else class="header-img-box">从媒体库选择</div>
+                    </div>
+                </el-form-item>
+                <el-form-item label="栏目配图" label-width="80px">
+                    <div style="display:inline-block" @click="openHeaderChange2">
+                        <img v-if="formData.term_taxonomy.descImg" alt="栏目配图" class="header-img-box2"
+                            :src="(formData.term_taxonomy.descImg && formData.term_taxonomy.descImg.slice(0, 4) !== 'http') ? path + formData.term_taxonomy.descImg : formData.term_taxonomy.descImg">
+                        <div v-else class="header-img-box">从媒体库选择</div>
+                    </div>
+                </el-form-item>
+
                 <el-form-item label="对象分组:" prop="term_group">
                     <el-input v-model.number="formData.term_group" :clearable="true" placeholder="请输入" />
                 </el-form-item>
@@ -81,6 +97,8 @@
                 </div>
             </template>
         </el-dialog>
+        <ChooseImg ref="chooseImg1" :target="formData.term_taxonomy" :target-key="`headerImg`" />
+        <ChooseImg ref="chooseImg2" :target="formData.term_taxonomy" :target-key="`descImg`" />
     </div>
 </template>
 
@@ -105,6 +123,9 @@ import { getDictFunc, formatDate, formatBoolean, filterDict } from '@/utils/form
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { ref, reactive, watch, onActivated, onDeactivated } from 'vue'
 import { useRoute } from 'vue-router';
+import ChooseImg from '@/components/chooseImg/index.vue'
+
+const path = ref(import.meta.env.VITE_BASE_API + '/')
 
 const route = useRoute()
 
@@ -117,8 +138,10 @@ const formData = ref({
     term_taxonomy: {
         "taxonomy": "cat",
         "description": "",
-        "parent_id": 0
-    }
+        "parent_id": 0,
+        "headerImg": '',
+        "descImg": '',
+    },
 })
 
 // 验证规则
@@ -178,6 +201,15 @@ watch(
         }
     }
 )
+
+const chooseImg1 = ref(null)
+const chooseImg2 = ref(null)
+const openHeaderChange1 = () => {
+    chooseImg1.value.open()
+}
+const openHeaderChange2 = () => {
+    chooseImg2.value.open()
+}
 
 // 查询
 const catOption = ref([])
@@ -264,7 +296,7 @@ const onDelete = async () => {
         multipleSelection.value.map(item => {
             ids.push(item.term_id)
         })
-        console.log("-------------")
+    console.log("-------------")
     console.log(ids)
     const res = await deleteCmsCatByIds({ ids })
     if (res.code === 0) {
@@ -330,8 +362,10 @@ const closeDialog = () => {
         term_taxonomy: {
             "taxonomy": "",
             "description": "",
-            "parent_id": 0
-        }
+            "parent_id": 0,
+            "headerImg": '',
+            "descImg": '',
+        },
     }
 }
 // 弹窗确定
@@ -367,4 +401,24 @@ const enterDialog = async () => {
 
 </script>
 
-<style></style>
+<style>
+
+ .header-img-box {
+  width: 200px;
+  height: 200px;
+  border: 1px dashed #ccc;
+  border-radius: 20px;
+  text-align: center;
+  line-height: 200px;
+  cursor: pointer;
+}
+ .header-img-box2 {
+  width: 300px;
+  height: 200px;
+  border: 1px dashed #ccc;
+  border-radius: 20px;
+  text-align: center;
+  line-height: 200px;
+  cursor: pointer;
+}
+</style>

@@ -102,6 +102,9 @@ const picList = ref([])
 const path = ref(import.meta.env.VITE_BASE_API + '/')
 
 const chooseImg = (url, target, targetKey) => {
+  console.log("++++++++++++")
+  console.log(path.value)
+  console.log(url)
   if (target && targetKey) {
     target[targetKey] = url
   }

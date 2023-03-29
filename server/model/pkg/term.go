@@ -26,6 +26,9 @@ type TermTaxonomy struct {
 	ParentID       int    `json:"parent_id" form:"parent_id" gorm:"column:parent_id;comment:;default:0;"`
 	Count          int    `json:"count" form:"count" gorm:"column:count;comment:;default:0;"`
 
+	HeaderImg string `json:"headerImg" gorm:"comment:栏目头像"`
+	DescImg   string `json:"descImg" gorm:"comment:栏目头像"`
+
 	Parent   *TermTaxonomy   `gorm:"foreignKey:ParentID"`                 // 定义父级关联关系
 	Children []*TermTaxonomy `json:"children" gorm:"foreignKey:ParentID"` // 定义子级关联关系
 	Posts    []Post          `json:"posts" gorm:"many2many:TermRelationships;foreignKey:TermTaxonomyId;joinForeignKey:TermTaxonomyId;References:ID;joinReferences:ObjectId"`
