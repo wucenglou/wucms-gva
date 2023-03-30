@@ -55,9 +55,6 @@ func (casbinService *CasbinService) UpdateCasbinApi(oldPath string, newPath stri
 		"v1": newPath,
 		"v2": newMethod,
 	}).Error
-	if err != nil {
-		return err
-	}
 	e := casbinService.Casbin()
 	err = e.InvalidateCache()
 	if err != nil {
@@ -103,11 +100,11 @@ func (casbinService *CasbinService) ClearCasbin(v int, p ...string) bool {
 //@return: *casbin.Enforcer
 
 var (
-	cachedEnforcer *casbin.CachedEnforcer
-	once           sync.Once
+	syncedCachedEnforcer *casbin.SyncedCachedEnforcer
+	once                 sync.Once
 )
 
-func (casbinService *CasbinService) Casbin() *casbin.CachedEnforcer {
+func (casbinService *CasbinService) Casbin() *casbin.SyncedCachedEnforcer {
 	once.Do(func() {
 		a, _ := gormadapter.NewAdapterByDB(global.GVA_DB)
 		text := `
@@ -131,9 +128,10 @@ func (casbinService *CasbinService) Casbin() *casbin.CachedEnforcer {
 			zap.L().Error("字符串加载模型失败!", zap.Error(err))
 			return
 		}
-		cachedEnforcer, _ = casbin.NewCachedEnforcer(m, a)
-		cachedEnforcer.SetExpireTime(60 * 60)
-		_ = cachedEnforcer.LoadPolicy()
+
+		syncedCachedEnforcer, _ = casbin.NewSyncedCachedEnforcer(m, a)
+		syncedCachedEnforcer.SetExpireTime(3600)
+		_ = syncedCachedEnforcer.LoadPolicy()
 	})
-	return cachedEnforcer
+	return syncedCachedEnforcer
 }

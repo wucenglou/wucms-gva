@@ -2,6 +2,7 @@ package pkg
 
 import (
 	"wucms-gva/server/global"
+	"wucms-gva/server/model/system"
 )
 
 type Comment struct {
@@ -19,9 +20,9 @@ type Comment struct {
 	ParentId    *int   `json:"parent_id" form:"parent_id" gorm:"foreignKey:TermId;index:parent_id;column:parent_id;comment:该评论所属的父级评论 ID，如果该评论是顶级评论，则值为 0;"`
 	UserId      *int   `json:"user_id" form:"user_id" gorm:"size:200;foreignKey:ID;index:user_id;column:user_id;comment:如果评论是由注册用户发布的，则显示用户的 ID;"`
 
-	User     User      `gorm:"foreignKey:UserId"`
-	Post     Post      `gorm:"foreignKey:PostId"`
-	Children []Comment `json:"children" gorm:"-"`
+	User     system.SysUser `gorm:"foreignKey:UserId;"`
+	Post     Post           `gorm:"foreignKey:PostId"`
+	Children []Comment      `json:"children" gorm:"-"`
 
 	CommentMeta []CommentMeta
 }

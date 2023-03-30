@@ -2,7 +2,6 @@ package system
 
 import (
 	"wucms-gva/server/global"
-	"wucms-gva/server/model/pkg"
 
 	uuid "github.com/satori/go.uuid"
 )
@@ -24,7 +23,18 @@ type SysUser struct {
 	Email       string         `json:"email"  gorm:"comment:用户邮箱"`                      // 用户邮箱
 	Enable      int            `json:"enable" gorm:"default:1;comment:用户是否被冻结 1正常 2冻结"` //用户是否被冻结 1正常 2冻结
 
-	UserMeta []pkg.UserMeta `gorm:"foreignKey:UserId;"`
+	UserMeta []UserMeta `gorm:"foreignKey:UserId;"`
+}
+
+type UserMeta struct {
+	UmetaId   *int   `gorm:"primarykey"` // 主键ID
+	UserId    *int   `json:"user_id" form:"user_id" gorm:"index:user_id;column:user_id;comment:;default:0;"`
+	MetaKey   string `json:"meta_key" form:"meta_key" gorm:"index:meta_key;column:meta_key;comment:;"`
+	MetaValue string `json:"meta_value" form:"meta_value" gorm:"column:meta_value;comment:;"`
+}
+
+func (UserMeta) TableName() string {
+	return "usermeta"
 }
 
 func (SysUser) TableName() string {

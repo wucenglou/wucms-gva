@@ -28,35 +28,54 @@
                     </template>
                 </el-popover>
             </div>
-            <el-table style="width: 100%" tooltip-effect="dark" default-expand-all :data="tableData" row-key="term_id"
+            <el-table style="width: 100%" tooltip-effect="dark" default-expand-all :data="postData" row-key="ID"
                 @selection-change="handleSelectionChange">
                 <el-table-column type="selection" width="55" />
-                <el-table-column align="left" label="id" prop="Term.name" width="120" />
-                <el-table-column align="left" label="标题" prop="Term.slug" width="120" />
-                <el-table-column align="left" label="分类" prop="description" show-overflow-tooltip width="320" />
-                <!-- <el-table-column align="left" label="名称" prop="Term.name" width="120" />
-                <el-table-column align="left" label="别名" prop="Term.slug" width="120" />
-                <el-table-column align="left" label="描述" prop="description" show-overflow-tooltip width="320" />
-                 -->
-                <el-table-column align="left" label="名称" prop="Term.name" width="120" />
-                <el-table-column align="left" label="别名" prop="Term.slug" width="120" />
-                <el-table-column align="left" label="描述" prop="description" show-overflow-tooltip width="320" />
-                <el-table-column align="left" label="总数" prop="count" width="120" />
-                <el-table-column align="left" label="对象分组" prop="Term.term_group" width="120" />
-                <el-table-column align="left" label="按钮组">
+                <el-table-column align="left" label="ID" prop="ID" width="120" />
+
+
+                <el-table-column align="left" label="标题" prop="post_title" width="300" />
+                <el-table-column align="left" label="分类" prop="termtaxonomy[0].Term.name" show-overflow-tooltip
+                    width="120" />
+                <el-table-column align="left" label="发布人" prop="User.nickName" width="120" />
+
+                <!-- <el-table-column align="left" label="更新时间" prop="UpdatedAt" width="120" /> -->
+                <el-table-column align="left" label="更新日期" width="180">
+                    <template #default="scope">{{
+                        formatDate(scope.row.UpdatedAt)
+                    }}</template>
+                </el-table-column>
+
+                <el-table-column align="left" label="状态" prop="post_status" width="120">
+                    <template #default="scope">
+                        <span v-if="scope.row.post_status == 'publish'">
+                            <el-button type="success">已发布</el-button>
+                        </span>
+                        <!-- <span v-else-if="scope.row.status == -1">
+                            <el-button type="danger" plain>{{ scope.row.statusName }}</el-button>
+                        </span>
+                        <span v-else-if="scope.row.status == 0">
+                            <el-button type="danger">{{ scope.row.statusName }}</el-button>
+                        </span>
+                        <span v-else>
+                            <el-button type="info" plain>{{ scope.row.statusName }}</el-button>
+                        </span> -->
+                    </template>
+                </el-table-column>
+                <el-table-column align="left" label="按钮组" width="200">
                     <template #default="scope">
                         <el-button type="primary" link icon="edit" size="small" class="table-button"
-                            @click="updateTermStructFunc(scope.row)">变更</el-button>
+                            @click="updatePostFunc(scope.row)">修改</el-button>
                         <el-button type="primary" link icon="delete" size="small"
                             @click="deleteRow(scope.row)">删除</el-button>
                     </template>
                 </el-table-column>
             </el-table>
-            <!-- <div class="gva-pagination">
+            <div class="gva-pagination">
                 <el-pagination layout="total, sizes, prev, pager, next, jumper" :current-page="page" :page-size="pageSize"
                     :page-sizes="[10, 30, 50, 100]" :total="total" @current-change="handleCurrentChange"
                     @size-change="handleSizeChange" />
-            </div> -->
+            </div>
         </div>
         <el-dialog v-model="dialogFormVisible" :before-close="closeDialog" title="添加分类">
             <el-form :model="formData" label-position="right" ref="elFormRef" :rules="rule" label-width="80px">
@@ -93,7 +112,7 @@
 
 <script>
 export default {
-    name: 'allArticle'
+    name: 'allPost'
 }
 </script>
 
@@ -106,14 +125,23 @@ import {
     findCmsCat,
     getCmsCatList
 } from '@/api/cms'
+import {
+    createPost,
+    updatePost,
+    deletePost,
+    deletePostByIds,
+    findPost,
+    getPostList
+} from '@/api/cmsPost'
 
 // 全量引入格式化工具 请按需保留
 import { getDictFunc, formatDate, formatBoolean, filterDict } from '@/utils/format'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { ref, reactive, watch, onActivated, onDeactivated } from 'vue'
-import { useRoute } from 'vue-router';
+import { useRoute, useRouter } from 'vue-router';
 
 const route = useRoute()
+const router = useRouter()
 
 console.log("99999999999999999999")
 // 自动化生成的字典（可能为空）以及字段
@@ -141,6 +169,7 @@ const total = ref(0)
 const pageSize = ref(10)
 const tableData = ref([])
 const searchInfo = ref({})
+const searchPostInfo = ref({})
 
 // 重置
 const onReset = () => {
@@ -158,13 +187,13 @@ const onSubmit = () => {
 // 分页
 const handleSizeChange = (val) => {
     pageSize.value = val
-    getTableData()
+    getPostData()
 }
 
 // 修改页面容量
 const handleCurrentChange = (val) => {
     page.value = val
-    // getTableData()
+    getPostData()
 }
 
 watch(
@@ -189,7 +218,7 @@ watch(
 // 查询
 const catOption = ref([])
 const getTableData = async () => {
-    console.log("调用一次")
+    // console.log("调用一次")
     searchInfo.value.model = "cat"
     const table = await getCmsCatList({ page: page.value, pageSize: pageSize.value, ...searchInfo.value })
     if (table.code === 0) {
@@ -207,12 +236,23 @@ const getTableData = async () => {
                 "parent_id": 0
             }
         })
-        total.value = table.data.total
-        page.value = table.data.page
-        pageSize.value = table.data.pageSize
     }
 }
 getTableData()
+
+const postData = ref()
+const getPostData = async () => {
+    console.log("调用一次")
+    const res = await getPostList({ page: page.value, pageSize: pageSize.value, ...searchPostInfo.value })
+    if (res.code === 0) {
+        postData.value = res.data.list
+        total.value = res.data.total
+        page.value = res.data.page
+        pageSize.value = res.data.pageSize
+    }
+    console.log(res.data)
+}
+getPostData()
 
 const handleName = (list) => {
     let arr = []
@@ -249,7 +289,7 @@ const deleteRow = (row) => {
         cancelButtonText: '取消',
         type: 'warning'
     }).then(() => {
-        deleteTermStructFunc(row)
+        deletePostFunc(row)
     })
 }
 
@@ -291,30 +331,20 @@ const onDelete = async () => {
 const type = ref('')
 
 // 更新行
-const updateTermStructFunc = async (row) => {
-    console.log("----------------")
-    console.log(row)
-    const res = await findCmsCat({ id: row.term_id })
-    type.value = 'update'
-    if (res.code === 0) {
-        formData.value = res.data.term
-        dialogFormVisible.value = true
-    }
+const updatePostFunc = async (row) => {
+    router.push({ name: 'edit' , query:{ model: row.termtaxonomy[0].taxonomy,post_id: row.ID}})
 }
 
 
 // 删除行
-const deleteTermStructFunc = async (row) => {
-    const res = await deleteCmsCat({ ID: row.term_id })
+const deletePostFunc = async (row) => {
+    const res = await deletePost({ ID: row.ID })
     if (res.code === 0) {
         ElMessage({
             type: 'success',
             message: '删除成功'
         })
-        if (tableData.value.length === 1 && page.value > 1) {
-            page.value--
-        }
-        getTableData()
+        getPostData()
     }
 }
 
@@ -356,7 +386,7 @@ const enterDialog = async () => {
                 res = await updateCmsCat(formData.value)
                 break
             default:
-                res = await createTermStruct(formData.value)
+                res = await createPost(formData.value)
                 break
         }
         console.log(res)

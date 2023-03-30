@@ -1,6 +1,6 @@
 import service from '@/utils/request'
 
-export const createpost = (data) => {
+export const createPost = (data) => {
     return service({
         url: '/post',
         method: 'post',
@@ -8,7 +8,7 @@ export const createpost = (data) => {
     })
 }
 
-export const updatepost = (data) => {
+export const updatePost = (data) => {
     return service({
         url: '/post',
         method: 'put',
@@ -16,7 +16,7 @@ export const updatepost = (data) => {
     })
 }
 
-export const deletepost = (data) => {
+export const deletePost = (data) => {
     return service({
         url: '/post',
         method: 'delete',
@@ -24,7 +24,7 @@ export const deletepost = (data) => {
     })
 }
 
-export const deletepostByIds = (data) => {
+export const deletePostByIds = (data) => {
     return service({
         url: '/post/ByIds',
         method: 'delete',
@@ -32,7 +32,7 @@ export const deletepostByIds = (data) => {
     })
 }
 
-export const findpost = (params) => {
+export const findPost = (params) => {
     return service({
         url: '/post/ById',
         method: 'get',
@@ -40,8 +40,7 @@ export const findpost = (params) => {
     })
 }
 
-export const getpostList = (params) => {
-    console.log(params)
+export const getPostList = (params) => {
     return service({
         url: '/post',
         method: 'get',

@@ -7,7 +7,7 @@
                 <el-form-item label="栏目" prop="term_id">
                     <el-cascader v-model="formData.term_id" placeholder="无" :disabled="dialogType == 'add'"
                         :options="catOption"
-                        :props="{ multiple: true,checkStrictly: true, label: 'name', value: 'TermTaxonomyId', disabled: 'disabled', emitPath: false }"
+                        :props="{ multiple: false,checkStrictly: true, label: 'name', value: 'TermTaxonomyId', disabled: 'disabled', emitPath: false }"
                         :show-all-levels="false" filterable />
                 </el-form-item>
 
@@ -100,31 +100,28 @@ export default {
     name: 'Edit',
 }
 </script>
-
 <script setup>
 import { ref, reactive, onMounted } from 'vue'
 import editor from "@/components/Editor/index.vue"
 import {
-    createpost,
-    updatepost,
-    deletepost,
-    deletepostByIds,
-    findpost,
-    getpostList
+    createPost,
+    updatePost,
+    deletePost,
+    deletePostByIds,
+    findPost,
+    getPostList
 } from '@/api/cmsPost'
 import {
     getCmsCatList
 } from '@/api/cms'
-
+import { ElMessage, ElMessageBox } from 'element-plus'
 import { useRoute } from 'vue-router';
-
-const route = useRoute()
 
 
 const formData = ref({
     term_id: [],
     user_id: '',
-    post_title: '标题',
+    post_title: '',
     status: '1',
     post_excerpt: '',
     post_content: "",
@@ -132,7 +129,20 @@ const formData = ref({
     menu_order: 0,
     comment_status: "open"
 })
-// const model
+const initForm = () => {
+    formData.value = {
+        term_id: [],
+        user_id: '',
+        post_title: '',
+        status: '1',
+        post_excerpt: '',
+        post_content: "",
+        post_status: "",
+        menu_order: 0,
+        comment_status: "open"
+    }
+}
+
 const type = ref('create')
 // =========== 表格控制部分 ===========
 const page = ref(1)
@@ -141,15 +151,25 @@ const pageSize = ref(10)
 const tableData = ref([])
 const searchInfo = ref({})
 
-console.log("777777777")
-console.log(route)
+const route = useRoute()
+const model = ref('cat')
+const post_id = ref(0)
+if(route.params.value){
+    // 如果有参数通过params传递model，则为创建模式，
+    // 否则是通过query传参，传过来model和post_id，则为修改模式
+    type.value = "create"
+    model.value = route.params.model
+}else{
+    type.value = "update"
+    model.value = route.query.model
+    post_id.value = route.query.post_id
+}
 
 // 查询
 const catOption = ref([])
 const getModel = async () => {
     console.log("调用一次")
-    // searchInfo.value.model = "model"
-    searchInfo.value.model = "cat"
+    searchInfo.value.model = model
     const table = await getCmsCatList({ page: page.value, pageSize: pageSize.value, ...searchInfo.value })
     if (table.code === 0) {
         handleName(table.data.list)
@@ -181,6 +201,22 @@ const getModel = async () => {
     }
 }
 getModel()
+
+const getPost = async() => {
+    const post = await findPost({ "id": post_id.value})
+    if (post.code === 0) {
+        formData.value = post.data.post
+        formData.value.term_id = post.data.post.termtaxonomy[0].term_id
+    }
+}
+if(post_id.value){
+    console.log("hava")
+    getPost()
+}else{
+    console.log("no")
+}
+
+
 const handleName = (list) => {
     let arr = []
     list.forEach(item => {
@@ -197,18 +233,30 @@ const onSubmit = async () => {
     switch (type.value) {
         case 'create':
             console.log(formData.value)
+            console.log(typeof formData.value.term_id)
+            if(typeof formData.value.term_id == "number"){
+                formData.value.term_id = [formData.value.term_id]
+            }
             // formData.value.term_taxonomy.taxonomy = route.params.model
             res = await createpost(formData.value)
             console.log(res)
             break
         case 'update':
-            console.log(formData.value)
-            // res = await updatepost(formData.value)
+            res = await updatepost(formData.value)
             break
         default:
             console.log(formData.value)
             // res = await createTermStruct(formData.value)
             break
+    }
+    if (res.code === 0) {
+        console.log("----------------------")
+        ElMessage({
+            type: 'success',
+            message: '创建/更改成功'
+        })
+        
+        initForm()
     }
 }
 

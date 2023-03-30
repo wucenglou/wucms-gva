@@ -20,9 +20,9 @@ func (s *Post) InitPostRouter(Router *gin.RouterGroup) {
 		// apiRouter.DELETE("deleteApisByIds", apiRouterApi.DeleteApisByIds) // 删除选中api
 	}
 	{
-		// apiRouterWithoutRecord.DELETE("", Post.DeleteCmsCat)
-		// apiRouterWithoutRecord.DELETE("ByIds", Post.DeleteCmsCatByIds)
-		// apiRouterWithoutRecord.PUT("", Post.UpdateCmsCat)
+		apiRouterWithoutRecord.DELETE("", Post.DeletePost)
+		apiRouterWithoutRecord.DELETE("ByIds", Post.DeletePostByIds)
+		apiRouterWithoutRecord.PUT("", Post.UpdatePost)
 		apiRouterWithoutRecord.GET("ById", Post.FindPost)
 		apiRouterWithoutRecord.GET("", Post.GetPostList)
 		// apiRouterWithoutRecord.POST("cattest", Post.CatTest)

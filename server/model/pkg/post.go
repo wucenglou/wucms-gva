@@ -2,6 +2,7 @@ package pkg
 
 import (
 	"wucms-gva/server/global"
+	"wucms-gva/server/model/system"
 )
 
 // TermStruct 结构体
@@ -18,15 +19,15 @@ type Post struct {
 	PostName            string `json:"post_name" form:"post_name" gorm:"size:200;index:post_name;column:post_name;comment:文章的永久链接（slug）;"`
 
 	PostPassword string `json:"post_password" form:"post_password" gorm:"size:255;column:post_password;comment:;"`
-	MenuOrder    *int   `json:"menu_order" form:"menu_order" gorm:"column:menu_order;comment:文章在菜单中的排序位置;default:0;"`
+	MenuOrder    int    `json:"menu_order" form:"menu_order" gorm:"column:menu_order;comment:文章在菜单中的排序位置;default:0;"`
 
 	PostMimeType  string `json:"post_mime_type" form:"post_mime_type" gorm:"size:100;column:post_mime_type;comment:附件的MIME类型;"`
 	CommentStatus string `json:"comment_status" form:"comment_status" gorm:"size:20;column:comment_status;comment:;default:'open';"`
-	CommentCount  *int   `json:"comment_count" form:"comment_count" gorm:"column:comment_count;comment:;default:0;"`
+	CommentCount  int    `json:"comment_count" form:"comment_count" gorm:"column:comment_count;comment:;default:0;"`
 
-	User User `gorm:"foreignKey:PostAuthor;"`
+	User system.SysUser `gorm:"foreignKey:PostAuthor;"`
 
-	TermTaxonomy []TermTaxonomy `json:"term_id" gorm:"many2many:TermRelationships;foreignKey:ID;joinForeignKey:ObjectId;References:TermTaxonomyId;joinReferences:TermTaxonomyId"`
+	TermTaxonomy []TermTaxonomy `json:"termtaxonomy" gorm:"many2many:TermRelationships;foreignKey:ID;joinForeignKey:ObjectId;References:TermTaxonomyId;joinReferences:TermTaxonomyId"`
 
 	PostMeta []PostMeta
 

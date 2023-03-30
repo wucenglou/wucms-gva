@@ -10,6 +10,8 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"go.uber.org/zap"
+	"gorm.io/gorm"
+	"gorm.io/gorm/clause"
 )
 
 type Post struct{}
@@ -59,7 +61,7 @@ func (post *Post) FindPost(c *gin.Context) {
 		return
 	}
 	var Post pkg.Post
-	err = global.GVA_DB.Where("id = ?", request.ID).First(&Post).Error
+	err = global.GVA_DB.Where("id = ?", request.ID).Preload("User").Preload("TermTaxonomy.Term").First(&Post).Error
 	if err != nil {
 		global.GVA_LOG.Error("查询失败!", zap.Error(err))
 		response.FailWithMessage("查询失败", c)
@@ -69,11 +71,95 @@ func (post *Post) FindPost(c *gin.Context) {
 }
 
 func (post *Post) GetPostList(c *gin.Context) {
-	var posts []pkg.Post
-	err := global.GVA_DB.Find(&posts).Error
+	var pageInfo request.PageInfo
+	err := c.ShouldBindQuery(&pageInfo)
 	if err != nil {
 		response.FailWithMessage(err.Error(), c)
 		return
 	}
-	response.OkWithDetailed(gin.H{"list": posts}, "查询成功", c)
+	limit := pageInfo.PageSize
+	offset := pageInfo.PageSize * (pageInfo.Page - 1)
+	// 创建db
+	db := global.GVA_DB.Model(&pkg.Post{})
+	var posts []pkg.Post
+	var total int64
+
+	if len(pageInfo.Keyword) > 0 {
+		db = db.Where("post_title like ?", "%"+pageInfo.Keyword+"%")
+	}
+	err = db.Count(&total).Error
+	if err != nil {
+		return
+	}
+	err = db.Limit(limit).Offset(offset).Omit("post_content").Preload("User").Preload("TermTaxonomy.Term").Order("updated_at desc").Find(&posts).Error
+
+	// err = global.GVA_DB.Preload("User").Preload("TermTaxonomy.Term").Find(&posts).Error
+
+	if err != nil {
+		response.FailWithMessage(err.Error(), c)
+		return
+	}
+	response.OkWithDetailed(response.PageResult{
+		List:     posts,
+		Total:    total,
+		Page:     pageInfo.Page,
+		PageSize: pageInfo.PageSize,
+	}, "获取成功", c)
+	// response.OkWithDetailed(gin.H{"list": posts}, "查询成功", c)
+}
+
+func (post *Post) DeletePostByIds(c *gin.Context) {
+	var IDS request.IdsReq
+	err := c.ShouldBindJSON(&IDS)
+	if err != nil {
+		response.FailWithMessage(err.Error(), c)
+		return
+	}
+	err = global.GVA_DB.Delete(&pkg.Post{}, "id in ?", IDS.Ids).Error
+	if err != nil {
+		response.FailWithMessage(err.Error(), c)
+		return
+	}
+	err = global.GVA_DB.Delete(&pkg.PostMeta{}, "post_id in ?", IDS.Ids).Error
+	if err != nil {
+		response.FailWithMessage(err.Error(), c)
+		return
+	}
+	response.OkWithMessage("删除成功", c)
+}
+
+func (post *Post) DeletePost(c *gin.Context) {
+	var request request.GetById
+	err := c.ShouldBind(&request)
+	if err != nil {
+		response.FailWithMessage(err.Error(), c)
+		return
+	}
+	var Post pkg.Post
+	err = global.GVA_DB.Where("id = ?", request.ID).First(&Post).Error
+	if err != nil {
+		response.FailWithMessage(err.Error(), c)
+		return
+	}
+	err = global.GVA_DB.Select(clause.Associations).Delete(&Post).Error
+	if err != nil {
+		response.FailWithMessage(err.Error(), c)
+		return
+	}
+	response.OkWithMessage("更新成功", c)
+}
+
+func (post *Post) UpdatePost(c *gin.Context) {
+	var Post pkg.Post
+	err := c.ShouldBindJSON(&Post)
+	if err != nil {
+		response.FailWithMessage(err.Error(), c)
+		return
+	}
+	err = global.GVA_DB.Session(&gorm.Session{FullSaveAssociations: true}).Save(&Post).Error
+	if err != nil {
+		response.FailWithMessage(err.Error(), c)
+		return
+	}
+	response.OkWithMessage("更新成功", c)
 }

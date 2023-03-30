@@ -3,7 +3,7 @@ module wucms-gva/server
 go 1.18
 
 require (
-	github.com/casbin/casbin/v2 v2.51.0
+	github.com/casbin/casbin/v2 v2.66.0
 	github.com/casbin/gorm-adapter/v3 v3.7.3
 	github.com/fsnotify/fsnotify v1.5.4
 	github.com/gin-gonic/gin v1.8.1
