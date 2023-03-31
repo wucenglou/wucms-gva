@@ -76,28 +76,19 @@ const defaultSetting = ref({
     content_css: 'tinymce/skins/content/default/content.min.css',
     min_height: 650,
     max_height: 800,
-    skeletonScreen: true,
     selector: '#text textarea',
     external_plugins: {
         'importword': 'tinymce/plugins/importword/plugin.min.js',
         'indent2em': 'tinymce/plugins/indent2em/plugin.min.js',
         'emoticons': 'tinymce/plugins/emoticons/plugin.min.js',
-        'bdmap': 'tinymce/plugins/bdmap/plugin.min.js'
+        'bdmap': 'tinymce/plugins/bdmap/plugin.min.js',
+        'layout': 'tinymce/plugins/layout/plugin.min.js'
     },
-    // menu: {
-    //     file: { title: '文件', items: 'newdocument print' },
-    //     edit: { title: '编辑', items: 'undo redo | cut copy paste pastetext | selectall' },
-    //     insert: { title: '插入', items: 'link media | template hr' },
-    //     view: { title: '查看', items: 'visualaid' },
-    //     format: { title: '格式', items: 'bold italic underline strikethrough superscript subscript | formats | removeformat' },
-    //     table: { title: '表格', items: 'inserttable tableprops deletetable | cell row column' },
-    //     tools: { title: '工具', items: 'spellchecker code' }
-    // },
     font_formats: '微软雅黑=Microsoft YaHei,Helvetica Neue,PingFang SC,sans-serif;苹果苹方=PingFang SC,Microsoft YaHei,sans-serif;宋体=simsun,serif',
-    plugins: 'importword print preview searchreplace autolink directionality visualblocks visualchars fullscreen image link media template codesample table charmap hr pagebreak nonbreaking anchor insertdatetime advlist lists wordcount imagetools textpattern help emoticons autosave bdmap autoresize importword',
-    toolbar: 'code undo redo | forecolor backcolor bold italic underline strikethrough link anchor | alignleft aligncenter alignright indent2em lineheight | \
+    plugins: 'paste edit code layout importword print preview searchreplace autolink directionality visualblocks visualchars fullscreen image link media template codesample table charmap hr pagebreak nonbreaking anchor insertdatetime advlist lists wordcount imagetools textpattern help emoticons autosave bdmap autoresize importword',
+    toolbar: 'undo redo code preview layout| forecolor backcolor bold italic underline strikethrough link anchor | alignleft aligncenter alignright indent2em lineheight | \
                     formatselect fontselect fontsizeselect | bullist numlist | blockquote subscript superscript removeformat | \
-                    table image media bdmap emoticons charmap hr pagebreak insertdatetime importword| fullscreen ',
+                    table image media bdmap emoticons charmap hr pagebreak insertdatetime importword| code fullscreen ',
     branding: false,
     // menubar: 'file edit insert view format table tools help',
     toolbar_mode: 'sliding',
@@ -108,14 +99,19 @@ const defaultSetting = ref({
         '%Y-%m-%d',
         '%H:%M:%S'
     ],
-    images_upload_handler: (blobInfo, progress) => new Promise((resolve, reject) => {
+    paste_data_images: true,
+    image_prepend_url: '/api/',
+    images_upload_handler: (blobInfo, success, failure) => {
         var formData;
         formData = new FormData();
         formData.append("file", blobInfo.blob(), blobInfo.filename());
         upload(formData).then(res => {
-            resolve(res.data.location)
+            console.log(res.data)
+            success(res.data.file.url)
+        }).catch(err => {
+            failure(err)
         })
-    }),
+    },
 })
 // console.log(blobInfo)
 

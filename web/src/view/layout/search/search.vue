@@ -1,46 +1,24 @@
 <template>
   <div class="search-component">
-    <div v-if="show" class="transition-box" style="display: inline-block;">
-      <el-select
-        ref="searchInput"
-        v-model="value"
-        filterable
-        placeholder="请选择"
-        @blur="hiddenSearch"
-        @change="changeRouter"
-      >
-        <el-option
-          v-for="item in routerStore.routerList"
-          :key="item.value"
-          :label="item.label"
-          :value="item.value"
-        />
+    <div v-if="show" class="transition-box">
+      <el-select ref="searchInput" filterable placeholder="请选择" @blur="hiddenSearch" @change="changeRouter">
+        <el-option v-for="item in routerStore.routerList" :key="item.value" :label="item.label" :value="item" />
       </el-select>
     </div>
-    <div
-      v-if="btnShow"
-      class="user-box"
-    >
-      <div class="gvaIcon gvaIcon-refresh" :class="[reload ? 'reloading' : '']" @click="handleReload" />
-    </div>
-    <div
-      v-if="btnShow"
-      class="user-box"
-    >
-      <div class="gvaIcon gvaIcon-search" @click="showSearch" />
-    </div>
-    <div
-      v-if="btnShow"
-      class="user-box"
-    >
-      <Screenfull class="search-icon" :style="{cursor:'pointer'}" />
-    </div>
-    <div
-      v-if="btnShow"
-      class="user-box"
-    >
-      <div class="service gvaIcon-customer-service" @click="toService" />
-    </div>
+    <template v-else>
+      <div class="user-box">
+        <div class="gvaIcon gvaIcon-refresh" :class="[reload ? 'reloading' : '']" @click="handleReload" />
+      </div>
+      <div class="user-box">
+        <div class="gvaIcon gvaIcon-search" @click="showSearch" />
+      </div>
+      <div class="user-box">
+        <Screenfull class="search-icon" :style="{ cursor: 'pointer' }" />
+      </div>
+      <div class="user-box">
+        <div class="service gvaIcon-customer-service" @click="toService" />
+      </div>
+    </template>
   </div>
 </template>
 
@@ -60,23 +38,44 @@ import { useRouterStore } from '@/pinia/modules/router'
 const router = useRouter()
 
 const routerStore = useRouterStore()
+const changeRouter = (e) => {
+  if (e.value.indexOf('http:') > -1 || e.value.indexOf('https:') > -1) {
+    window.open(e.value)
+    return
+  }
+  if (e.params.length == 0) {
+    router.push({ name: e.value })
+  } else {
+    let params = {}
+    let query = {}
+    e.params.forEach(res => {
+      if (res.type == "query") {
+        query[res.key] = res.value
+      } else if (res.type == "params") {
+        params[res.key] = res.value
+      }
+    })
+    router.push({ name: e.value, params: params,query: query})
+  }
+  // try {
+  //   router.push({ name: e.value })
+  // } catch (err) {
+  //   console.log()
 
-const value = ref('')
-const changeRouter = () => {
-  router.push({ name: value.value })
-  value.value = ''
+  //   console.log("不支持")
+  // }
+
 }
 
 const show = ref(false)
-const btnShow = ref(true)
-const hiddenSearch = () => {
-  show.value = false
-  btnShow.value = true
+const hiddenSearch = async () => {
+  setTimeout(() => {
+    show.value = false
+  }, 100)
 }
 
 const searchInput = ref(null)
-const showSearch = async() => {
-  btnShow.value = false
+const showSearch = async () => {
   show.value = true
   await nextTick()
   searchInput.value.focus()
@@ -96,29 +95,69 @@ const toService = () => {
 
 </script>
 <style scoped lang="scss">
-.reload{
+.reload {
   font-size: 18px;
 }
 
-.reloading{
-  animation:turn 0.5s linear infinite;
+.transition-box {
+  overflow: hidden;
+  width: 160px;
+  margin-right: 32px;
+  text-align: center;
+
+  ::v-deep(.el-input__wrapper) {
+    .el-input__inner {
+      border-bottom: 1px solid var(--el-color-info-light-7);
+    }
+
+    box-shadow: none !important;
+  }
+
+  ::v-deep(.el-select .el-input .el-input__wrapper.is-focus) {
+    box-shadow: none !important;
+  }
+
+  ::v-deep(.el-select .el-input.is-focus .el-input__wrapper) {
+    box-shadow: none !important;
+  }
 }
+
+
+.reloading {
+  animation: turn 0.5s linear infinite;
+}
+
 @keyframes turn {
-  0%{transform:rotate(0deg);}
-  25%{transform:rotate(90deg);}
-  50%{transform:rotate(180deg);}
-  75%{transform:rotate(270deg);}
-  100%{transform:rotate(360deg);}
+  0% {
+    transform: rotate(0deg);
+  }
+
+  25% {
+    transform: rotate(90deg);
+  }
+
+  50% {
+    transform: rotate(180deg);
+  }
+
+  75% {
+    transform: rotate(270deg);
+  }
+
+  100% {
+    transform: rotate(360deg);
+  }
 }
 
 .service {
-  font-family: "gvaIcon",serif !important;
-    font-size: 16px;
-    font-style: normal;
-    font-weight: 800;
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
-  }
+  font-family: "gvaIcon", serif !important;
+  font-size: 16px;
+  font-style: normal;
+  font-weight: 800;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
 //小屏幕不显示
 @media (max-width: 750px) {
   .service {

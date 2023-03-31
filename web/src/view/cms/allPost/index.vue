@@ -32,13 +32,10 @@
                 @selection-change="handleSelectionChange">
                 <el-table-column type="selection" width="55" />
                 <el-table-column align="left" label="ID" prop="ID" width="120" />
-
-
                 <el-table-column align="left" label="标题" prop="post_title" width="300" />
                 <el-table-column align="left" label="分类" prop="termtaxonomy[0].Term.name" show-overflow-tooltip
                     width="120" />
                 <el-table-column align="left" label="发布人" prop="User.nickName" width="120" />
-
                 <!-- <el-table-column align="left" label="更新时间" prop="UpdatedAt" width="120" /> -->
                 <el-table-column align="left" label="更新日期" width="180">
                     <template #default="scope">{{
@@ -51,15 +48,18 @@
                         <span v-if="scope.row.post_status == 'publish'">
                             <el-button type="success">已发布</el-button>
                         </span>
-                        <!-- <span v-else-if="scope.row.status == -1">
-                            <el-button type="danger" plain>{{ scope.row.statusName }}</el-button>
+                        <span v-else-if="scope.row.post_status == 'Pending'">
+                            <el-button type="danger">待审核</el-button>
                         </span>
-                        <span v-else-if="scope.row.status == 0">
-                            <el-button type="danger">{{ scope.row.statusName }}</el-button>
+                        <span v-else-if="scope.row.post_status == 'reject'">
+                            <el-button type="info">已拒绝</el-button>
+                        </span>
+                        <span v-else-if="scope.row.post_status == 'Draft'">
+                            <el-button type="info">草稿</el-button>
                         </span>
                         <span v-else>
-                            <el-button type="info" plain>{{ scope.row.statusName }}</el-button>
-                        </span> -->
+                            <el-button type="info" plain>未定义</el-button>
+                        </span>
                     </template>
                 </el-table-column>
                 <el-table-column align="left" label="按钮组" width="200">
@@ -143,6 +143,8 @@ import { useRoute, useRouter } from 'vue-router';
 const route = useRoute()
 const router = useRouter()
 
+const model = ref('cat')
+
 console.log("99999999999999999999")
 // 自动化生成的字典（可能为空）以及字段
 const formData = ref({
@@ -219,7 +221,7 @@ watch(
 const catOption = ref([])
 const getTableData = async () => {
     // console.log("调用一次")
-    searchInfo.value.model = "cat"
+    searchInfo.value.model = model.value
     const table = await getCmsCatList({ page: page.value, pageSize: pageSize.value, ...searchInfo.value })
     if (table.code === 0) {
         handleName(table.data.list)
@@ -309,11 +311,9 @@ const onDelete = async () => {
     }
     multipleSelection.value &&
         multipleSelection.value.map(item => {
-            ids.push(item.term_id)
+            ids.push(item.ID)
         })
-    console.log("-------------")
-    console.log(ids)
-    const res = await deleteCmsCatByIds({ ids })
+    const res = await deletePostByIds({ ids })
     if (res.code === 0) {
         ElMessage({
             type: 'success',
@@ -323,7 +323,7 @@ const onDelete = async () => {
             page.value--
         }
         deleteVisible.value = false
-        getTableData()
+        getPostData()
     }
 }
 
@@ -332,7 +332,7 @@ const type = ref('')
 
 // 更新行
 const updatePostFunc = async (row) => {
-    router.push({ name: 'edit' , query:{ model: row.termtaxonomy[0].taxonomy,post_id: row.ID}})
+    router.push({ name: 'edit', query: { model: row.termtaxonomy[0].taxonomy, post_id: row.ID } })
 }
 
 
@@ -353,8 +353,9 @@ const dialogFormVisible = ref(false)
 
 // 打开弹窗
 const openDialog = () => {
+    router.push({ name: 'edit', query: { model: model.value } })
     type.value = 'create'
-    dialogFormVisible.value = true
+    // dialogFormVisible.value = true
 }
 
 // 关闭弹窗
@@ -378,9 +379,10 @@ const enterDialog = async () => {
         let res
         switch (type.value) {
             case 'create':
-                console.log(formData.value)
-                formData.value.term_taxonomy.taxonomy = route.params.model
-                res = await createCmsCat(formData.value)
+                // router.push({ name: 'edit', params: { model: row.termtaxonomy[0].taxonomy } })
+                // console.log(formData.value)
+                // formData.value.term_taxonomy.taxonomy = route.params.model
+                // res = await createCmsCat(formData.value)
                 break
             case 'update':
                 res = await updateCmsCat(formData.value)

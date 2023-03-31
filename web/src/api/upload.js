@@ -5,7 +5,7 @@ import service from '@/utils/request'
 // @Router /base/login [post]
 export const upload = (data) => {
     return service({
-        url: '/uploadimgs',
+        url: '/fileUploadAndDownload/upload',
         method: 'post',
         data: data
     })

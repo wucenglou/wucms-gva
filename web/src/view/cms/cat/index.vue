@@ -37,7 +37,7 @@
                 <el-table-column align="left" label="描述" prop="description" show-overflow-tooltip width="320" />
                 <el-table-column align="left" label="总数" prop="count" width="120" />
                 <el-table-column align="left" label="对象分组" prop="Term.term_group" width="120" />
-                <el-table-column align="left" label="按钮组">
+                <el-table-column align="left" label="按钮组" width="200">
                     <template #default="scope">
                         <el-button type="primary" link icon="edit" size="small" class="table-button"
                             @click="updateTermStructFunc(scope.row)">变更</el-button>
@@ -404,8 +404,8 @@ const enterDialog = async () => {
 <style>
 
  .header-img-box {
-  width: 200px;
-  height: 200px;
+  width: 160px;
+  height: 160px;
   border: 1px dashed #ccc;
   border-radius: 20px;
   text-align: center;

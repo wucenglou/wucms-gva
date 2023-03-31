@@ -79,6 +79,10 @@ func Routers() *gin.Engine {
 
 		pkgRouter.InitPostRouter(PrivateGroup)
 
+		pkgRouter.InitDoctorRouter(PrivateGroup)
+		pkgRouter.InitRegRouter(PrivateGroup)
+		pkgRouter.InitPatientRouter(PrivateGroup)
+
 		exampleRouter.InitFileUploadAndDownloadRouter(PrivateGroup) // 文件上传下载功能路由
 	}
 

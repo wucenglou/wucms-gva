@@ -1,6 +1,7 @@
 package middleware
 
 import (
+	"errors"
 	"fmt"
 	"strconv"
 	"time"
@@ -37,7 +38,7 @@ func JWTAuth() gin.HandlerFunc {
 		print("解析出的用户信息")
 		fmt.Println(claims)
 		if err != nil {
-			if err == utils.ErrTokenExpired {
+			if errors.Is(err, utils.ErrTokenExpired) {
 				response.FailWithDetailed(gin.H{"reload": true}, "授权已过期", c)
 				c.Abort()
 				return

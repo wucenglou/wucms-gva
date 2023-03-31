@@ -57,6 +57,10 @@ func RegisterTables(db *gorm.DB) {
 		pkg.TermMeta{},
 		pkg.TermTaxonomy{},
 		pkg.TermRelationship{},
+		pkg.Doctor{},
+		pkg.Patient{},
+		pkg.Reg{},
+
 		system.UserMeta{},
 
 		// 自动化模块表
