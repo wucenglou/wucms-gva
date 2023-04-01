@@ -91,7 +91,7 @@ local:
     path: uploads/file
     store-path: uploads/file
 mysql:
-    path: 127.0.0.1
+    path: 101.43.70.226
     port: "3306"
     config: charset=utf8mb4&parseTime=True&loc=Local
     db-name: wucms_gva
