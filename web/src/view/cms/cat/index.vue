@@ -269,7 +269,7 @@ const handleSelectionChange = (val) => {
 
 // 删除行
 const deleteRow = (row) => {
-    ElMessageBox.confirm('确定要删除吗?', '提示', {
+    ElMessageBox.confirm('前端可能正在使用,确定要删除吗?', '重要提示', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
         type: 'warning'

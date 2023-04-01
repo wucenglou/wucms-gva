@@ -71,7 +71,7 @@ func (post *Post) FindPost(c *gin.Context) {
 }
 
 func (post *Post) GetPostList(c *gin.Context) {
-	var pageInfo request.PageInfo
+	var pageInfo request.ModelPageInfo
 	err := c.ShouldBindQuery(&pageInfo)
 	if err != nil {
 		response.FailWithMessage(err.Error(), c)
@@ -83,8 +83,10 @@ func (post *Post) GetPostList(c *gin.Context) {
 	db := global.GVA_DB.Model(&pkg.Post{})
 	var posts []pkg.Post
 	var total int64
-
 	if len(pageInfo.Keyword) > 0 {
+		db = db.Where("post_title like ?", "%"+pageInfo.Keyword+"%")
+	}
+	if pageInfo.TermId > 0 {
 		db = db.Where("post_title like ?", "%"+pageInfo.Keyword+"%")
 	}
 	err = db.Count(&total).Error

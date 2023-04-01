@@ -332,7 +332,7 @@ const type = ref('')
 
 // 更新行
 const updatePostFunc = async (row) => {
-    router.push({ name: 'edit', query: { model: row.termtaxonomy[0].taxonomy, post_id: row.ID } })
+    router.push({ name: 'edit', params:{model: row.termtaxonomy[0].taxonomy },query: { model: row.termtaxonomy[0].taxonomy, post_id: row.ID } })
 }
 
 
@@ -353,7 +353,7 @@ const dialogFormVisible = ref(false)
 
 // 打开弹窗
 const openDialog = () => {
-    router.push({ name: 'edit', query: { model: model.value } })
+    router.push({ name: 'edit', params:{model: model.value }, query: { model: model.value } })
     type.value = 'create'
     // dialogFormVisible.value = true
 }

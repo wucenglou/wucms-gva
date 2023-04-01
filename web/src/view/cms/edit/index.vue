@@ -125,12 +125,23 @@ const searchInfo = ref({})
 const route = useRoute()
 const model = ref('cat')
 const post_id = ref(0)
-if (route.params.value) {
+if (route.params) {
     // 如果有参数通过params传递model，则为创建模式，
     // 否则是通过query传参，传过来model和post_id，则为修改模式
     type.value = "create"
+    console.log("11111111111111")
+    console.log(route)
+    if (route.query.post_id) {
+        type.value = "update"
+        post_id.value = route.query.post_id
+    } else {
+        type.value = "create"
+    }
     model.value = route.params.model
 } else {
+    console.log("22222222222")
+    console.log(route)
+    console.log(route.params)
     if (route.query.post_id) {
         type.value = "update"
         post_id.value = route.query.post_id
@@ -144,7 +155,9 @@ if (route.params.value) {
 const catOption = ref([])
 const getModel = async () => {
     console.log("调用一次")
-    searchInfo.value.model = model
+    console.log("88888888888888888")
+    console.log(model)
+    searchInfo.value.model = model.value
     const table = await getCmsCatList({ page: page.value, pageSize: pageSize.value, ...searchInfo.value })
     if (table.code === 0) {
         handleName(table.data.list)
