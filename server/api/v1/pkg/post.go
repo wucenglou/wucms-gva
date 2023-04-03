@@ -71,7 +71,7 @@ func (post *Post) FindPost(c *gin.Context) {
 }
 
 func (post *Post) GetPostList(c *gin.Context) {
-	var pageInfo request.ModelPageInfo
+	var pageInfo request.PageInfo
 	err := c.ShouldBindQuery(&pageInfo)
 	if err != nil {
 		response.FailWithMessage(err.Error(), c)
@@ -83,10 +83,8 @@ func (post *Post) GetPostList(c *gin.Context) {
 	db := global.GVA_DB.Model(&pkg.Post{})
 	var posts []pkg.Post
 	var total int64
+
 	if len(pageInfo.Keyword) > 0 {
-		db = db.Where("post_title like ?", "%"+pageInfo.Keyword+"%")
-	}
-	if pageInfo.TermId > 0 {
 		db = db.Where("post_title like ?", "%"+pageInfo.Keyword+"%")
 	}
 	err = db.Count(&total).Error
@@ -152,16 +150,22 @@ func (post *Post) DeletePost(c *gin.Context) {
 }
 
 func (post *Post) UpdatePost(c *gin.Context) {
-	var Post pkg.Post
-	err := c.ShouldBindJSON(&Post)
+	var reqPost req.ReqPost
+	err := c.ShouldBindJSON(&reqPost)
 	if err != nil {
 		response.FailWithMessage(err.Error(), c)
 		return
 	}
-	err = global.GVA_DB.Session(&gorm.Session{FullSaveAssociations: true}).Save(&Post).Error
+	err = global.GVA_DB.Session(&gorm.Session{FullSaveAssociations: true}).Save(&reqPost.Post).Error
 	if err != nil {
 		response.FailWithMessage(err.Error(), c)
 		return
 	}
+	var termTaxonomy []pkg.TermTaxonomy
+	for _, v := range reqPost.TermIds {
+		t := pkg.TermTaxonomy{TermTaxonomyId: uint(v)}
+		termTaxonomy = append(termTaxonomy, t)
+	}
+	global.GVA_DB.Model(&reqPost.Post).Association("TermTaxonomy").Replace(&termTaxonomy)
 	response.OkWithMessage("更新成功", c)
 }

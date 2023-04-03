@@ -30,7 +30,7 @@ func (m *MyApi) GetPostList(c *gin.Context) {
 	if err != nil {
 		return
 	}
-	err = db.Limit(limit).Offset(offset).Preload("Posts").Find(&term).Error
+	err = db.Limit(limit).Offset(offset).Preload("Posts.User").Find(&term).Error
 	if err != nil {
 		return
 	}

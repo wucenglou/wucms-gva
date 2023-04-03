@@ -4,8 +4,8 @@
 
             <el-form ref="Form" :model="formData" :rules="rules" label-width="5em">
 
-                <el-form-item label="栏目" prop="term_id">
-                    <el-cascader v-model="formData.term_id" placeholder="无" :disabled="dialogType == 'add'"
+                <el-form-item label="栏目">
+                    <el-cascader v-model="formData.term_id" placeholder="无"
                         :options="catOption"
                         :props="{ multiple: false, checkStrictly: true, label: 'name', value: 'TermTaxonomyId', disabled: 'disabled', emitPath: false }"
                         :show-all-levels="false" filterable />
@@ -88,7 +88,7 @@ import ChooseImg from '@/components/chooseImg/index.vue'
 const path = ref(import.meta.env.VITE_BASE_API + '/')
 
 const formData = ref({
-    term_id: [],
+    term_id: 0,
     user_id: '',
     post_title: '',
     status: '1',
@@ -97,11 +97,12 @@ const formData = ref({
     post_content: "",
     post_status: "publish",
     menu_order: 0,
-    comment_status: "open"
+    comment_status: "open",
+    term_taxonomy: [],
 })
 const initForm = () => {
     formData.value = {
-        term_id: [0],
+        term_id: 0,
         user_id: '',
         post_title: '',
         status: '1',
@@ -110,7 +111,8 @@ const initForm = () => {
         post_content: "",
         post_status: "publish",
         menu_order: 0,
-        comment_status: "open"
+        comment_status: "open",
+        term_taxonomy: '',
     }
 }
 
@@ -161,17 +163,9 @@ const getModel = async () => {
     const table = await getCmsCatList({ page: page.value, pageSize: pageSize.value, ...searchInfo.value })
     if (table.code === 0) {
         handleName(table.data.list)
-        // table.data.list.forEach(res=>{
-        //     if(res.Term.slug != "model"){
-        //         catOption.value.push(res)
-        //     }
-        // })
-        tableData.value = table.data.list.slice()
         catOption.value = table.data.list.slice()
         console.log("+++++++++++")
         console.log(catOption.value)
-        console.log(table.data.list)
-
         catOption.value.unshift({
             term_id: 0,
             TermTaxonomyId: 0,
@@ -194,7 +188,9 @@ const getPost = async () => {
     const post = await findPost({ "id": post_id.value })
     if (post.code === 0) {
         formData.value = post.data.post
-        formData.value.term_id = post.data.post.termtaxonomy[0].term_id
+        formData.value.term_id = post.data.post.termtaxonomy[0].TermTaxonomyId
+        console.log("++++++++++++++++++", post.data.post.termtaxonomy[0].TermTaxonomyId)
+        console.log(formData.value)
     }
 }
 if (post_id.value) {
@@ -231,6 +227,11 @@ const onSubmit = async () => {
             console.log(res)
             break
         case 'update':
+            console.log(catOption.value)
+            console.log(formData.value)
+            if (typeof formData.value.term_id == "number") {
+                formData.value.term_id = [formData.value.term_id]
+            }
             res = await updatePost(formData.value)
             break
         default:
@@ -245,7 +246,7 @@ const onSubmit = async () => {
             message: '创建/更改成功'
         })
 
-        initForm()
+        // initForm()
     }
 }
 

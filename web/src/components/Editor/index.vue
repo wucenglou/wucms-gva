@@ -48,8 +48,6 @@ import 'tinymce/plugins/template'
 
 
 import { upload } from '@/api/upload'
-import { resolve } from 'path'
-import { reject } from 'lodash-es'
 // import useSettingsStore from '@/store/modules/settings'
 
 // const settingsStore = useSettingsStore()
@@ -88,7 +86,7 @@ const defaultSetting = ref({
         // 'imagetools': 'tinymce/plugins/imagetools/plugin.min.js'
     },
     font_formats: '微软雅黑=Microsoft YaHei,Helvetica Neue,PingFang SC,sans-serif;苹果苹方=PingFang SC,Microsoft YaHei,sans-serif;宋体=simsun,serif',
-    plugins: 'imagetools paste edit code layout importword print preview searchreplace autolink directionality visualblocks visualchars fullscreen image link media template codesample table charmap hr pagebreak nonbreaking anchor insertdatetime advlist lists wordcount imagetools textpattern help emoticons autosave bdmap autoresize importword',
+    plugins: 'imagetools paste edit code layout importword print preview searchreplace autolink directionality visualblocks visualchars fullscreen image link media template codesample table charmap hr pagebreak nonbreaking anchor insertdatetime advlist lists wordcount help emoticons autosave bdmap autoresize importword',
     toolbar: 'undo redo code preview layout| forecolor backcolor bold italic underline strikethrough link anchor | alignleft aligncenter alignright indent2em lineheight | \
                     formatselect fontselect fontsizeselect | bullist numlist | blockquote subscript superscript removeformat | \
                     table image media bdmap emoticons charmap hr pagebreak insertdatetime importword| code fullscreen ',

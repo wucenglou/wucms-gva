@@ -1,5 +1,6 @@
 <template>
     <div>
+        <warning-bar title="注：仅有一篇内容的分类，默认为单页" />
         <!-- <div class="gva-search-box">
             <el-form :inline="true" :model="searchInfo" class="demo-form-inline" @keyup.enter="onSubmit">
                 <el-form-item label="创建时间">
@@ -124,6 +125,8 @@ import { ElMessage, ElMessageBox } from 'element-plus'
 import { ref, reactive, watch, onActivated, onDeactivated } from 'vue'
 import { useRoute } from 'vue-router';
 import ChooseImg from '@/components/chooseImg/index.vue'
+import WarningBar from '@/components/warningBar/warningBar.vue'
+
 
 const path = ref(import.meta.env.VITE_BASE_API + '/')
 
