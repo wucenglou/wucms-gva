@@ -35,12 +35,15 @@
             <el-table ref="multipleTable" style="width: 100%" tooltip-effect="dark" :data="tableData" row-key="ID"
                 @selection-change="handleSelectionChange">
                 <el-table-column type="selection" width="55" />
+
+                <el-table-column align="left" label="姓名" prop="name" width="120" />
+                <el-table-column align="left" label="头衔" prop="title" width="120" />
+                <el-table-column align="left" label="专长" show-overflow-tooltip prop="specialty" width="120" />
+                <el-table-column align="left" label="个人介绍" show-overflow-tooltip prop="desc" width="200" />
+                <el-table-column align="left" label="手机号" prop="phone" width="120" />
                 <el-table-column align="left" label="日期" width="180">
                     <template #default="scope">{{ formatDate(scope.row.CreatedAt) }}</template>
                 </el-table-column>
-                <el-table-column align="left" label="姓名" prop="name" width="120" />
-                <el-table-column align="left" label="手机号" prop="phone" width="120" />
-                <el-table-column align="left" label="描述" prop="desc" width="120" />
                 <el-table-column align="left" label="按钮组">
                     <template #default="scope">
                         <el-button type="primary" link icon="edit" size="small" class="table-button"
@@ -61,11 +64,31 @@
                 <el-form-item label="医生:" prop="name">
                     <el-input v-model="formData.name" :clearable="true" placeholder="请输入" />
                 </el-form-item>
+                <el-form-item label="头衔:" prop="title">
+                    <el-input v-model="formData.title" :clearable="true" placeholder="请输入" />
+                </el-form-item>
+                <el-form-item label="专长:" prop="specialty">
+                    <el-input v-model="formData.specialty" type="textarea" :clearable="true" placeholder="请输入" />
+                </el-form-item>
+                <el-form-item label="个人介绍:" prop="desc">
+                    <el-input v-model="formData.desc" type="textarea" :clearable="true" placeholder="请输入" />
+                </el-form-item>
                 <el-form-item label="手机号:" prop="phone">
                     <el-input v-model.number="formData.phone" :clearable="true" placeholder="请输入" />
                 </el-form-item>
-                <el-form-item label="描述:" prop="desc">
-                    <el-input v-model="formData.desc" :clearable="true" placeholder="请输入" />
+                <el-form-item label="医生头像" label-width="80px">
+                    <div style="display:inline-block" @click="openHeaderChange1">
+                        <img v-if="formData.profile_img" alt="图标" class="header-img-box"
+                            :src="(formData.profile_img && formData.profile_img.slice(0, 4) !== 'http') ? path + formData.profile_img : formData.profile_img">
+                        <div v-else class="header-img-box">从媒体库选择</div>
+                    </div>
+                </el-form-item>
+                <el-form-item label="医生配图" label-width="80px">
+                    <div style="display:inline-block" @click="openHeaderChange2">
+                        <img v-if="formData.desc_img" alt="栏目配图" class="header-img-box2"
+                            :src="(formData.desc_img && formData.desc_img.slice(0, 4) !== 'http') ? path + formData.desc_img : formData.desc_img">
+                        <div v-else class="header-img-box">从媒体库选择</div>
+                    </div>
                 </el-form-item>
             </el-form>
             <template #footer>
@@ -75,6 +98,8 @@
                 </div>
             </template>
         </el-dialog>
+        <ChooseImg ref="chooseImg1" :target="formData" :target-key="`profile_img`" />
+        <ChooseImg ref="chooseImg2" :target="formData" :target-key="`desc_img`" />
     </div>
 </template>
 
@@ -98,12 +123,17 @@ import {
 import { getDictFunc, formatDate, formatBoolean, filterDict } from '@/utils/format'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { ref, reactive } from 'vue'
+import ChooseImg from '@/components/chooseImg/index.vue'
+
+const path = ref(import.meta.env.VITE_BASE_API + '/')
 
 // 自动化生成的字典（可能为空）以及字段
 const formData = ref({
     name: '',
     phone: 0,
     desc: '',
+    profile_img: '',
+    desc_img:'',
 })
 
 // 验证规则
@@ -186,6 +216,14 @@ const deleteRow = (row) => {
     })
 }
 
+const chooseImg1 = ref(null)
+const chooseImg2 = ref(null)
+const openHeaderChange1 = () => {
+    chooseImg1.value.open()
+}
+const openHeaderChange2 = () => {
+    chooseImg2.value.open()
+}
 
 // 批量删除控制标记
 const deleteVisible = ref(false)
@@ -293,4 +331,23 @@ const enterDialog = async () => {
 }
 </script>
 
-<style></style>
+<style>
+ .header-img-box {
+  width: 160px;
+  height: 160px;
+  border: 1px dashed #ccc;
+  border-radius: 20px;
+  text-align: center;
+  line-height: 200px;
+  cursor: pointer;
+}
+ .header-img-box2 {
+  width: 300px;
+  height: 200px;
+  border: 1px dashed #ccc;
+  border-radius: 20px;
+  text-align: center;
+  line-height: 200px;
+  cursor: pointer;
+}
+</style>
