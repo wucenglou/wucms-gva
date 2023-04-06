@@ -36,15 +36,21 @@
                 @selection-change="handleSelectionChange">
                 <el-table-column type="selection" width="55" />
 
+                <!-- <el-table-column align="left" label="头像" min-width="75">
+                    <template #default="scope">
+                        <CustomPic style="margin-top:8px;align-items: center;" :pic-src="scope.row.profile_img" />
+                    </template>
+                </el-table-column> -->
+
                 <el-table-column align="left" label="姓名" prop="name" width="120" />
-                <el-table-column align="left" label="头衔" prop="title" width="120" />
-                <el-table-column align="left" label="专长" show-overflow-tooltip prop="specialty" width="120" />
-                <el-table-column align="left" label="个人介绍" show-overflow-tooltip prop="desc" width="200" />
+                <el-table-column align="left" label="头衔" prop="title" width="200" />
+                <el-table-column align="left" label="专长" show-overflow-tooltip prop="specialty" width="250" />
+                <el-table-column align="left" label="个人介绍" show-overflow-tooltip prop="desc" width="300" />
                 <el-table-column align="left" label="手机号" prop="phone" width="120" />
                 <el-table-column align="left" label="日期" width="180">
                     <template #default="scope">{{ formatDate(scope.row.CreatedAt) }}</template>
                 </el-table-column>
-                <el-table-column align="left" label="按钮组">
+                <el-table-column align="left" label="按钮组" width="200">
                     <template #default="scope">
                         <el-button type="primary" link icon="edit" size="small" class="table-button"
                             @click="updateDoctorFunc(scope.row)">变更</el-button>
@@ -124,6 +130,7 @@ import { getDictFunc, formatDate, formatBoolean, filterDict } from '@/utils/form
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { ref, reactive } from 'vue'
 import ChooseImg from '@/components/chooseImg/index.vue'
+import CustomPic from '@/components/customPic/index.vue'
 
 const path = ref(import.meta.env.VITE_BASE_API + '/')
 
@@ -133,7 +140,7 @@ const formData = ref({
     phone: 0,
     desc: '',
     profile_img: '',
-    desc_img:'',
+    desc_img: '',
 })
 
 // 验证规则
@@ -331,23 +338,68 @@ const enterDialog = async () => {
 }
 </script>
 
-<style>
- .header-img-box {
-  width: 160px;
-  height: 160px;
-  border: 1px dashed #ccc;
-  border-radius: 20px;
-  text-align: center;
-  line-height: 200px;
-  cursor: pointer;
+<style lang="scss">
+.header-img-box {
+    width: 160px;
+    height: 160px;
+    border: 1px dashed #ccc;
+    border-radius: 20px;
+    text-align: center;
+    line-height: 200px;
+    cursor: pointer;
 }
- .header-img-box2 {
-  width: 300px;
-  height: 200px;
-  border: 1px dashed #ccc;
-  border-radius: 20px;
-  text-align: center;
-  line-height: 200px;
-  cursor: pointer;
+
+.header-img-box2 {
+    width: 300px;
+    height: 200px;
+    border: 1px dashed #ccc;
+    border-radius: 20px;
+    text-align: center;
+    line-height: 200px;
+    cursor: pointer;
+}
+.user-dialog {
+    .header-img-box {
+        width: 200px;
+        height: 200px;
+        border: 1px dashed #ccc;
+        border-radius: 20px;
+        text-align: center;
+        line-height: 200px;
+        cursor: pointer;
+    }
+
+    .avatar-uploader .el-upload:hover {
+        border-color: #409eff;
+    }
+
+    .avatar-uploader-icon {
+        border: 1px dashed #d9d9d9 !important;
+        border-radius: 6px;
+        font-size: 28px;
+        color: #8c939d;
+        width: 178px;
+        height: 178px;
+        line-height: 178px;
+        text-align: center;
+    }
+
+    .avatar {
+        width: 178px;
+        height: 178px;
+        display: block;
+    }
+}
+
+.nickName {
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+}
+
+.pointer {
+    cursor: pointer;
+    font-size: 16px;
+    margin-left: 2px;
 }
 </style>
