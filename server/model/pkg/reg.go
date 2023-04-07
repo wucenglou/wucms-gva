@@ -38,15 +38,17 @@ type Reg struct {
 	From       string `json:"from" form:"from" gorm:"column:from;comment:;"`
 	Time       string `json:"time" form:"time" gorm:"column:time;comment:;"`
 	Desc       string `json:"desc" form:"desc" gorm:"type:longtext;column:desc;comment:;"`
-	GptSuggest string `json:"gptSuggest" form:"gptSuggest" gorm:"type:longtext;column:gptSuggest;comment:;"`
+	GptSuggest string `json:"gpt_suggest" form:"gpt_suggest" gorm:"type:longtext;column:gpt_suggest;comment:;"`
 	Ip         string `json:"ip" form:"ip" gorm:"column:ip;comment:;"`
 	IpDesc     string `json:"ipDesc" form:"ipDesc" gorm:"column:ipDesc;comment:;"`
 	DoctorName string `json:"doctor_name" form:"doctor_name" gorm:"column:doctor_name;comment:;"`
 
-	PatientId *int           `json:"patientid" form:"patientid" gorm:"foreignKey:ID;index:patientid;column:patientid;"`
-	Patient   system.SysUser `gorm:"foreignKey:PatientId;"`
+	Status string `json:"status" form:"status" gorm:"size:20;index:status;column:status;comment:;default:'PendingClinic';comment:PendingClinic待就诊PendingPay待付款ClinicOver就诊完成ClinicCancel取消挂号"`
 
-	DoctorId *int           `json:"doctorid" form:"doctorid" gorm:"foreignKey:ID;index:doctorid;column:doctorid;"`
+	UserId *int           `json:"user_id" form:"user_id" gorm:"foreignKey:ID;index:user_id;column:user_id;"`
+	User   system.SysUser `gorm:"foreignKey:UserId;"`
+
+	DoctorId *int           `json:"doctor_id" form:"doctor_id" gorm:"foreignKey:ID;index:doctor_id;column:doctor_id;"`
 	Doctor   system.SysUser `gorm:"foreignKey:DoctorId;"`
 }
 
@@ -76,7 +78,7 @@ type Patient struct {
 	Desc   string `json:"desc" form:"desc" gorm:"type:longtext;column:desc;comment:;"`
 	Ip     string `json:"ip" form:"ip" gorm:"column:ip;comment:;"`
 
-	UserId *int           `json:"user_id" form:"user_id" gorm:"size:200;foreignKey:ID;index:user_id;column:user_id;"`
+	UserId uint           `json:"user_id" form:"user_id" gorm:"size:200;foreignKey:ID;index:user_id;column:user_id;"`
 	User   system.SysUser `gorm:"foreignKey:UserId;"`
 }
 

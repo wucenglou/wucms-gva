@@ -5,6 +5,7 @@ import (
 	"wucms-gva/server/model/common/request"
 	"wucms-gva/server/model/common/response"
 	"wucms-gva/server/model/pkg"
+	"wucms-gva/server/utils"
 
 	"github.com/gin-gonic/gin"
 	"go.uber.org/zap"
@@ -20,6 +21,14 @@ func (P *Patient) CreatePatient(c *gin.Context) {
 		response.FailWithMessage(err.Error(), c)
 		return
 	}
+
+	user, _ := utils.GetUser(c)
+	ip := c.ClientIP()
+
+	// var tmp pkg.Patient
+	// tmp.UserId = user.ID
+	Patient.UserId = user.ID
+	Patient.Ip = ip
 
 	err = global.GVA_DB.Create(&Patient).Error
 	if err != nil {
@@ -83,7 +92,7 @@ func (P *Patient) FindPatient(c *gin.Context) {
 		return
 	}
 	var Patient pkg.Patient
-	err = global.GVA_DB.Where("id = ?", request.ID).Preload("doctor").First(&Patient).Error
+	err = global.GVA_DB.Where("id = ?", request.ID).First(&Patient).Error
 	if err != nil {
 		global.GVA_LOG.Error("查询失败!", zap.Error(err))
 		response.FailWithMessage("查询失败", c)
@@ -113,7 +122,7 @@ func (P *Patient) GetPatientList(c *gin.Context) {
 	if err != nil {
 		return
 	}
-	err = db.Limit(limit).Offset(offset).Order("updated_at desc").Find(&Patients).Error
+	err = db.Limit(limit).Offset(offset).Order("updated_at desc").Preload("User").Find(&Patients).Error
 
 	// err = global.GVA_DB.Preload("User").Preload("TermTaxonomy.Term").Find(&Patients).Error
 

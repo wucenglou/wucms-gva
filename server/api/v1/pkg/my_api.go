@@ -102,3 +102,69 @@ func (m *MyApi) CreateApi(c *gin.Context) {
 	// }, "获取成功", c)
 	response.Ok(c)
 }
+
+func (m *MyApi) DeletePatient(c *gin.Context) {
+	var request request.GetById
+	err := c.ShouldBind(&request)
+	if err != nil {
+		response.FailWithMessage(err.Error(), c)
+		return
+	}
+	user, _ := utils.GetUser(c)
+	var Patient pkg.Patient
+	db := global.GVA_DB.Where("id = ?", request.ID)
+	err = db.Find(&Patient).Error
+	if Patient.UserId == user.ID {
+		err = db.Delete(&Patient).Error
+		if err != nil {
+			response.FailWithMessage(err.Error(), c)
+			return
+		}
+	} else {
+		response.OkWithMessage("没有权限", c)
+	}
+	// err = global.GVA_DB.Where("id = ?", request.ID).Delete(&Patient).Error
+	if err != nil {
+		response.FailWithMessage(err.Error(), c)
+		return
+	}
+	response.OkWithMessage("更新成功", c)
+}
+
+func (m *MyApi) GetRegList(c *gin.Context) {
+	var pageInfo pkg.RegSearch
+	err := c.ShouldBindQuery(&pageInfo)
+	if err != nil {
+		response.FailWithMessage(err.Error(), c)
+		return
+	}
+	user, _ := utils.GetUser(c)
+	limit := pageInfo.PageSize
+	offset := pageInfo.PageSize * (pageInfo.Page - 1)
+	// 创建db
+	db := global.GVA_DB.Model(&pkg.Reg{}).Where("user_id =?", user.ID)
+	var Regs []pkg.Reg
+	var total int64
+	if len(pageInfo.Keyword) > 0 {
+		db = db.Where("status = ?", pageInfo.Keyword)
+	}
+	err = db.Count(&total).Error
+	if err != nil {
+		return
+	}
+	err = db.Limit(limit).Offset(offset).Order("updated_at desc").Find(&Regs).Error
+
+	// err = global.GVA_DB.Preload("User").Preload("TermTaxonomy.Term").Find(&Regs).Error
+
+	if err != nil {
+		response.FailWithMessage(err.Error(), c)
+		return
+	}
+	response.OkWithDetailed(response.PageResult{
+		List:     Regs,
+		Total:    total,
+		Page:     pageInfo.Page,
+		PageSize: pageInfo.PageSize,
+	}, "获取成功", c)
+	// response.OkWithDetailed(gin.H{"list": Regs}, "查询成功", c)
+}

@@ -41,6 +41,27 @@
                 <el-table-column align="left" label="姓名" prop="name" width="120" />
                 <el-table-column align="left" label="手机号" prop="phone" width="120" />
                 <el-table-column align="left" label="描述" prop="desc" width="120" />
+
+                <el-table-column align="left" label="挂号状态" prop="status" width="120">
+                    <template #default="scope">
+                        <span v-if="scope.row.status == 'PendingClinic'">
+                            <el-button type="success">待就诊</el-button>
+                        </span>
+                        <span v-else-if="scope.row.status == 'PendingPay'">
+                            <el-button type="danger">待付款</el-button>
+                        </span>
+                        <span v-else-if="scope.row.status == 'ClinicOver'">
+                            <el-button type="info">就诊完成</el-button>
+                        </span>
+                        <span v-else-if="scope.row.status == 'ClinicCancel'">
+                            <el-button type="info">取消挂号</el-button>
+                        </span>
+                        <span v-else>
+                            <el-button type="info" plain>未定义</el-button>
+                        </span>
+                    </template>
+                </el-table-column>
+
                 <el-table-column align="left" label="按钮组">
                     <template #default="scope">
                         <el-button type="primary" link icon="edit" size="small" class="table-button"

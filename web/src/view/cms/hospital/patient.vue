@@ -35,12 +35,15 @@
             <el-table ref="multipleTable" style="width: 100%" tooltip-effect="dark" :data="tableData" row-key="ID"
                 @selection-change="handleSelectionChange">
                 <el-table-column type="selection" width="55" />
-                <el-table-column align="left" label="日期" width="180">
-                    <template #default="scope">{{ formatDate(scope.row.CreatedAt) }}</template>
-                </el-table-column>
-                <el-table-column align="left" label="姓名" prop="name" width="120" />
+                
+                <el-table-column align="left" label="患者" prop="name" width="200" />
                 <el-table-column align="left" label="手机号" prop="phone" width="120" />
-                <el-table-column align="left" label="描述" prop="desc" width="120" />
+                <el-table-column align="left" label="描述" prop="desc" width="300" />
+                <!-- <el-table-column align="left" label="ip" prop="ip" width="120" /> -->
+                <el-table-column align="left" label="添加用户" prop="User.userName" width="120" />
+                <el-table-column align="left" label="日期" width="180">
+                        <template #default="scope">{{ formatDate(scope.row.CreatedAt) }}</template>
+                    </el-table-column>
                 <el-table-column align="left" label="按钮组">
                     <template #default="scope">
                         <el-button type="primary" link icon="edit" size="small" class="table-button"
@@ -223,7 +226,7 @@ const type = ref('')
 
 // 更新行
 const updatePatientFunc = async (row) => {
-    const res = await findPatient({ ID: row.ID })
+    const res = await findPatient({ id: row.ID })
     type.value = 'update'
     if (res.code === 0) {
         formData.value = res.data.Patient
