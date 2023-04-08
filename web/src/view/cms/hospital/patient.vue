@@ -44,7 +44,7 @@
                 <el-table-column align="left" label="日期" width="180">
                         <template #default="scope">{{ formatDate(scope.row.CreatedAt) }}</template>
                     </el-table-column>
-                <el-table-column align="left" label="按钮组">
+                <el-table-column align="left" label="按钮组" width="200">
                     <template #default="scope">
                         <el-button type="primary" link icon="edit" size="small" class="table-button"
                             @click="updatePatientFunc(scope.row)">变更</el-button>

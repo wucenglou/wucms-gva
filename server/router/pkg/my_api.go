@@ -37,8 +37,11 @@ func (s *MyApi) InitMyApiRouter(Router *gin.RouterGroup) {
 		MyRouterWithoutRecord.GET("getDoctorList", doctorApi.GetDoctorList)    // 获取Pkg列表
 		MyRouterWithoutRecord.GET("findPatient", patientApi.FindPatient)       // 根据ID获取Pkg
 		MyRouterWithoutRecord.GET("getPatientList", patientApi.GetPatientList) // 获取Pkg列表
-		MyRouterWithoutRecord.GET("findReg", RegApi.FindReg)                   // 根据ID获取Pkg
-		MyRouterWithoutRecord.GET("getRegList", api.GetRegList)                // 获取Pkg列表
+
+		MyRouterWithoutRecord.GET("findReg", RegApi.FindReg)    // 根据ID获取Pkg
+		MyRouterWithoutRecord.GET("getRegList", api.GetRegList) // 获取Pkg列表
+		MyRouterWithoutRecord.POST("createReg", api.CreateReg)
+
 		MyRouterWithoutRecord.GET("post/ById", Post.FindPost)
 		MyRouterWithoutRecord.GET("post", api.GetPostList)
 		MyRouterWithoutRecord.PUT("", CmsCatApi.UpdateCmsCat)

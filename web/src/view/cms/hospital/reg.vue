@@ -38,9 +38,9 @@
                 <el-table-column align="left" label="日期" width="180">
                     <template #default="scope">{{ formatDate(scope.row.CreatedAt) }}</template>
                 </el-table-column>
-                <el-table-column align="left" label="姓名" prop="name" width="120" />
+                <el-table-column align="left" label="姓名" prop="name" width="200" />
                 <el-table-column align="left" label="手机号" prop="phone" width="120" />
-                <el-table-column align="left" label="描述" prop="desc" width="120" />
+                <el-table-column align="left" label="描述" prop="desc" show-overflow-tooltip width="300" />
 
                 <el-table-column align="left" label="挂号状态" prop="status" width="120">
                     <template #default="scope">
@@ -62,7 +62,7 @@
                     </template>
                 </el-table-column>
 
-                <el-table-column align="left" label="按钮组">
+                <el-table-column align="left" label="按钮组" width="200">
                     <template #default="scope">
                         <el-button type="primary" link icon="edit" size="small" class="table-button"
                             @click="updateRegFunc(scope.row)">变更</el-button>
@@ -85,6 +85,12 @@
                 <el-form-item label="手机号:" prop="phone">
                     <el-input v-model.number="formData.phone" :clearable="true" placeholder="请输入" />
                 </el-form-item>
+                <el-form-item label="状态:" prop="status">
+                    <el-select v-model="formData.status" class="m-2" placeholder="Select" size="small">
+                        <el-option v-for="item in options" :key="item.value" :label="item.label" :value="item.value" />
+                    </el-select>
+                </el-form-item>
+
                 <el-form-item label="描述:" prop="desc">
                     <el-input v-model="formData.desc" :clearable="true" placeholder="请输入" />
                 </el-form-item>
@@ -119,6 +125,26 @@ import {
 import { getDictFunc, formatDate, formatBoolean, filterDict } from '@/utils/format'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { ref, reactive } from 'vue'
+
+
+const options = [
+    {
+        value: 'PendingClinic',
+        label: '待就诊',
+    },
+    {
+        value: 'PendingPay',
+        label: '待付款',
+    },
+    {
+        value: 'ClinicOver',
+        label: '就诊完成',
+    },
+    {
+        value: 'ClinicCancel',
+        label: '取消挂号',
+    },
+]
 
 // 自动化生成的字典（可能为空）以及字段
 const formData = ref({

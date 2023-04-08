@@ -45,7 +45,7 @@ type Reg struct {
 
 	Status string `json:"status" form:"status" gorm:"size:20;index:status;column:status;comment:;default:'PendingClinic';comment:PendingClinic待就诊PendingPay待付款ClinicOver就诊完成ClinicCancel取消挂号"`
 
-	UserId *int           `json:"user_id" form:"user_id" gorm:"foreignKey:ID;index:user_id;column:user_id;"`
+	UserId uint           `json:"user_id" form:"user_id" gorm:"foreignKey:ID;index:user_id;column:user_id;"`
 	User   system.SysUser `gorm:"foreignKey:UserId;"`
 
 	DoctorId *int           `json:"doctor_id" form:"doctor_id" gorm:"foreignKey:ID;index:doctor_id;column:doctor_id;"`

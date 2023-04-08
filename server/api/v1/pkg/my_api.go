@@ -168,3 +168,23 @@ func (m *MyApi) GetRegList(c *gin.Context) {
 	}, "获取成功", c)
 	// response.OkWithDetailed(gin.H{"list": Regs}, "查询成功", c)
 }
+
+func (m *MyApi) CreateReg(c *gin.Context) {
+	var Reg pkg.Reg
+	err := c.ShouldBindJSON(&Reg)
+	if err != nil {
+		response.FailWithMessage(err.Error(), c)
+		return
+	}
+	user, _ := utils.GetUser(c)
+	ip := c.ClientIP()
+
+	Reg.UserId = user.ID
+	Reg.Ip = ip
+	err = global.GVA_DB.Create(&Reg).Error
+	if err != nil {
+		response.FailWithMessage(err.Error(), c)
+		return
+	}
+	response.OkWithDetailed(gin.H{}, "创建成功", c)
+}
