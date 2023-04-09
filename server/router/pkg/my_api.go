@@ -28,15 +28,16 @@ func (s *MyApi) InitMyApiRouter(Router *gin.RouterGroup) {
 	}
 	{
 
-		MyRouterWithoutRecord.POST("createPatient", patientApi.CreatePatient)
 		MyRouterWithoutRecord.DELETE("deletePatient", api.DeletePatient)
 		MyRouterWithoutRecord.PUT("updatePatient", patientApi.UpdatePatient)
 
-		MyRouterWithoutRecord.POST("create", api.CreateApi)                    // 新建TestStrutc
-		MyRouterWithoutRecord.GET("findDoctor", doctorApi.FindDoctor)          // 根据ID获取Pkg
-		MyRouterWithoutRecord.GET("getDoctorList", doctorApi.GetDoctorList)    // 获取Pkg列表
+		MyRouterWithoutRecord.POST("create", api.CreateApi)                 // 新建TestStrutc
+		MyRouterWithoutRecord.GET("findDoctor", doctorApi.FindDoctor)       // 根据ID获取Pkg
+		MyRouterWithoutRecord.GET("getDoctorList", doctorApi.GetDoctorList) // 获取Pkg列表
+		// 患者管理
 		MyRouterWithoutRecord.GET("findPatient", patientApi.FindPatient)       // 根据ID获取Pkg
 		MyRouterWithoutRecord.GET("getPatientList", patientApi.GetPatientList) // 获取Pkg列表
+		MyRouterWithoutRecord.POST("createPatient", api.CreatePatient)         // 新建Pkg
 
 		MyRouterWithoutRecord.GET("findReg", RegApi.FindReg)    // 根据ID获取Pkg
 		MyRouterWithoutRecord.GET("getRegList", api.GetRegList) // 获取Pkg列表

@@ -2,6 +2,8 @@ package pkg
 
 import (
 	"fmt"
+	"regexp"
+	"strconv"
 	"wucms-gva/server/global"
 	"wucms-gva/server/model/common/request"
 	"wucms-gva/server/model/common/response"
@@ -19,6 +21,11 @@ func (r *Reg) CreateReg(c *gin.Context) {
 	err := c.ShouldBindJSON(&Reg)
 	if err != nil {
 		response.FailWithMessage(err.Error(), c)
+		return
+	}
+	matched, _ := regexp.MatchString("^(13[0-9]|14[01456879]|15[0-35-9]|16[2567]|17[0-8]|18[0-9]|19[0-35-9])\\d{8}$", strconv.Itoa(Reg.Phone))
+	if !matched {
+		response.FailWithMessage("手机号码有误", c)
 		return
 	}
 	err = global.GVA_DB.Create(&Reg).Error
@@ -85,7 +92,7 @@ func (r *Reg) FindReg(c *gin.Context) {
 	fmt.Println("pppppppppppppppppppppppp")
 	fmt.Println(request.ID)
 	var reg pkg.Reg
-	err = global.GVA_DB.Where("id = ?", request.ID).First(&reg).Error
+	err = global.GVA_DB.Where("id = ?", request.ID).Preload("Doctor").First(&reg).Error
 	if err != nil {
 		global.GVA_LOG.Error("查询失败!", zap.Error(err))
 		response.FailWithMessage("查询失败", c)
@@ -115,7 +122,10 @@ func (r *Reg) GetRegList(c *gin.Context) {
 	if err != nil {
 		return
 	}
-	err = db.Limit(limit).Offset(offset).Order("updated_at desc").Find(&Regs).Error
+	if pageInfo.StartCreatedAt != nil && pageInfo.EndCreatedAt != nil {
+		db = db.Where("created_at BETWEEN ? AND ?", pageInfo.StartCreatedAt, pageInfo.EndCreatedAt)
+	}
+	err = db.Limit(limit).Offset(offset).Preload("Doctor").Preload("User").Order("updated_at desc").Find(&Regs).Error
 
 	// err = global.GVA_DB.Preload("User").Preload("TermTaxonomy.Term").Find(&Regs).Error
 

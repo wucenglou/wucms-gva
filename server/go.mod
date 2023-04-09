@@ -113,6 +113,7 @@ require (
 require github.com/go-sql-driver/mysql v1.6.0
 
 require (
+	github.com/lionsoul2014/ip2region/binding/golang v0.0.0-20230403015023-b609e27f253c
 	github.com/otiai10/copy v1.7.0
 	github.com/qiniu/api.v7/v7 v7.8.2
 	golang.org/x/text v0.3.7

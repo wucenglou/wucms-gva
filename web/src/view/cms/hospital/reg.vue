@@ -35,13 +35,14 @@
             <el-table ref="multipleTable" style="width: 100%" tooltip-effect="dark" :data="tableData" row-key="ID"
                 @selection-change="handleSelectionChange">
                 <el-table-column type="selection" width="55" />
-                <el-table-column align="left" label="日期" width="180">
-                    <template #default="scope">{{ formatDate(scope.row.CreatedAt) }}</template>
-                </el-table-column>
-                <el-table-column align="left" label="姓名" prop="name" width="200" />
+                
+                <el-table-column align="left" label="患者姓名" prop="name" width="200" />
                 <el-table-column align="left" label="手机号" prop="phone" width="120" />
-                <el-table-column align="left" label="描述" prop="desc" show-overflow-tooltip width="300" />
-
+                <el-table-column align="left" label="就诊时间" prop="time" width="200" />
+                <el-table-column align="left" label="病种" prop="bz" width="100" />
+                <el-table-column align="left" label="描述" prop="desc" show-overflow-tooltip width="200" />
+                <el-table-column align="left" label="IP位置(供参考)" prop="ipDesc" width="200" />
+                <el-table-column align="left" label="账户用户名" prop="User.userName" show-overflow-tooltip width="200" />
                 <el-table-column align="left" label="挂号状态" prop="status" width="120">
                     <template #default="scope">
                         <span v-if="scope.row.status == 'PendingClinic'">
@@ -61,7 +62,9 @@
                         </span>
                     </template>
                 </el-table-column>
-
+                <el-table-column align="left" label="日期" width="180">
+                        <template #default="scope">{{ formatDate(scope.row.CreatedAt) }}</template>
+                    </el-table-column>
                 <el-table-column align="left" label="按钮组" width="200">
                     <template #default="scope">
                         <el-button type="primary" link icon="edit" size="small" class="table-button"

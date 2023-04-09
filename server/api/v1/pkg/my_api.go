@@ -2,6 +2,8 @@ package pkg
 
 import (
 	"fmt"
+	"regexp"
+	"strconv"
 	"wucms-gva/server/global"
 	"wucms-gva/server/model/common/request"
 	"wucms-gva/server/model/common/response"
@@ -103,6 +105,39 @@ func (m *MyApi) CreateApi(c *gin.Context) {
 	response.Ok(c)
 }
 
+// 患者管理
+func (m *MyApi) CreatePatient(c *gin.Context) {
+	var Patient pkg.Patient
+	err := c.ShouldBindJSON(&Patient)
+	if err != nil {
+		response.FailWithMessage(err.Error(), c)
+		return
+	}
+	matched, _ := regexp.MatchString("^(13[0-9]|14[01456879]|15[0-35-9]|16[2567]|17[0-8]|18[0-9]|19[0-35-9])\\d{8}$", strconv.Itoa(Patient.Phone))
+	if !matched {
+		response.FailWithMessage("手机号码有误", c)
+		return
+	}
+	matchedName, _ := regexp.MatchString("^[\u4E00-\u9FA5|A-Z|a-z].+$", Patient.Name)
+	if !matchedName {
+		response.FailWithMessage("姓名不能含特殊字符", c)
+		return
+	}
+	user, _ := utils.GetUser(c)
+	ip := c.ClientIP()
+	// var tmp pkg.Patient
+	// tmp.UserId = user.ID
+	Patient.UserId = user.ID
+	Patient.Ip = ip
+
+	err = global.GVA_DB.Create(&Patient).Error
+	if err != nil {
+		response.FailWithMessage(err.Error(), c)
+		return
+	}
+	response.OkWithDetailed(gin.H{}, "创建成功", c)
+}
+
 func (m *MyApi) DeletePatient(c *gin.Context) {
 	var request request.GetById
 	err := c.ShouldBind(&request)
@@ -176,11 +211,18 @@ func (m *MyApi) CreateReg(c *gin.Context) {
 		response.FailWithMessage(err.Error(), c)
 		return
 	}
+	matched, _ := regexp.MatchString("^(13[0-9]|14[01456879]|15[0-35-9]|16[2567]|17[0-8]|18[0-9]|19[0-35-9])\\d{8}$", strconv.Itoa(Reg.Phone))
+	if !matched {
+		response.FailWithMessage("手机号码有误", c)
+		return
+	}
 	user, _ := utils.GetUser(c)
 	ip := c.ClientIP()
-
+	ipInfo, _ := utils.GetIpInfo("113.121.36.199")
+	fmt.Println(ipInfo)
 	Reg.UserId = user.ID
 	Reg.Ip = ip
+	Reg.IpDesc = ipInfo
 	err = global.GVA_DB.Create(&Reg).Error
 	if err != nil {
 		response.FailWithMessage(err.Error(), c)

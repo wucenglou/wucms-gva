@@ -32,7 +32,7 @@ type PatientSearch struct {
 type Reg struct {
 	global.GVA_MODEL
 	Name       string `json:"name" form:"name" gorm:"column:name;comment:;"`
-	Phone      *int   `json:"phone" form:"phone" gorm:"column:phone;comment:;"`
+	Phone      int    `json:"phone" form:"phone" gorm:"column:phone;comment:;"`
 	Bz         string `json:"bz" form:"bz" gorm:"column:bz;comment:;"`
 	Gender     string `json:"gender" form:"gender" gorm:"column:gender;comment:;"`
 	From       string `json:"from" form:"from" gorm:"column:from;comment:;"`
@@ -72,7 +72,7 @@ type Doctor struct {
 type Patient struct {
 	global.GVA_MODEL
 	Name   string `json:"name" form:"name" gorm:"column:name;comment:;"`
-	Phone  *int   `json:"phone" form:"phone" gorm:"column:phone;comment:;"`
+	Phone  int    `json:"phone" form:"phone" gorm:"column:phone;comment:;"`
 	Gender string `json:"gender" form:"gender" gorm:"column:gender;comment:;"`
 	From   string `json:"from" form:"from" gorm:"column:from;comment:;"`
 	Desc   string `json:"desc" form:"desc" gorm:"type:longtext;column:desc;comment:;"`

@@ -1,6 +1,8 @@
 package pkg
 
 import (
+	"regexp"
+	"strconv"
 	"wucms-gva/server/global"
 	"wucms-gva/server/model/common/request"
 	"wucms-gva/server/model/common/response"
@@ -21,7 +23,11 @@ func (P *Patient) CreatePatient(c *gin.Context) {
 		response.FailWithMessage(err.Error(), c)
 		return
 	}
-
+	matched, _ := regexp.MatchString("^(13[0-9]|14[01456879]|15[0-35-9]|16[2567]|17[0-8]|18[0-9]|19[0-35-9])\\d{8}$", strconv.Itoa(Patient.Phone))
+	if !matched {
+		response.FailWithMessage("手机号码有误", c)
+		return
+	}
 	user, _ := utils.GetUser(c)
 	ip := c.ClientIP()
 
