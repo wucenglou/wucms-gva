@@ -1,16 +1,25 @@
 package pkg
 
 import (
+	"encoding/json"
+	"errors"
 	"fmt"
+	"io/ioutil"
+	"net/http"
 	"regexp"
 	"strconv"
 	"wucms-gva/server/global"
 	"wucms-gva/server/model/common/request"
 	"wucms-gva/server/model/common/response"
 	"wucms-gva/server/model/pkg"
+	"wucms-gva/server/model/system"
+	systemRes "wucms-gva/server/model/system/response"
 	"wucms-gva/server/utils"
 
 	"github.com/gin-gonic/gin"
+	uuid "github.com/satori/go.uuid"
+	"go.uber.org/zap"
+	"gorm.io/gorm"
 )
 
 type MyApi struct{}
@@ -223,10 +232,98 @@ func (m *MyApi) CreateReg(c *gin.Context) {
 	Reg.UserId = user.ID
 	Reg.Ip = ip
 	Reg.IpDesc = ipInfo
+	var tmp pkg.Reg
+	err = global.GVA_DB.Where("user_id = ?", user.ID).Where("time = ?", Reg.Time).First(&tmp).Error
+	// if err != nil {
+	// 	response.FailWithMessage(err.Error(), c)
+	// 	return
+	// }
+	if !errors.Is(err, gorm.ErrRecordNotFound) {
+		response.FailWithMessage("已经挂号成功", c)
+		return
+	}
 	err = global.GVA_DB.Create(&Reg).Error
 	if err != nil {
 		response.FailWithMessage(err.Error(), c)
 		return
 	}
 	response.OkWithDetailed(gin.H{}, "创建成功", c)
+}
+
+func (m *MyApi) CreateUser(c *gin.Context) {}
+
+func (m *MyApi) GetUser(c *gin.Context) {
+	userInfo, _ := utils.GetUser(c)
+	var user system.SysUser
+	global.GVA_DB.First(&user, userInfo.ID)
+	response.OkWithDetailed(gin.H{"user": user}, "查询成功", c)
+}
+
+type Wxinfo struct {
+	Code string
+}
+
+func (m *MyApi) WxLogin(c *gin.Context) {
+	var wxcode Wxinfo
+	err := c.ShouldBindJSON(&wxcode)
+	if err != nil {
+		response.FailWithMessage(err.Error(), c)
+		return
+	}
+	resp, _ := http.Get("https://api.weixin.qq.com/sns/jscode2session?appid=wxd178a3abd041537c&secret=3ba16f2f82174472c92fbe32e4868d43&js_code=" + wxcode.Code + "&grant_type=authorization_code")
+	closer := resp.Body
+	bytes, _ := ioutil.ReadAll(closer)
+	info := make(map[string]interface{})
+	err = json.Unmarshal(bytes, &info)
+	if err != nil {
+		return
+	}
+	if info["openid"] == nil {
+		response.FailWithMessage(err.Error(), c)
+	}
+	var user system.SysUser
+	err = global.GVA_DB.Where("open_id = ?", info["openid"]).First(&user).Error
+	if errors.Is(err, gorm.ErrRecordNotFound) {
+		// 新建用户
+		var newUser system.SysUser
+		newUser.NickName = "微信用户"
+		newUser.AuthorityId = 0
+		newUser.UUID = uuid.NewV4()
+		newUser.OpenId = info["openid"].(string)
+		err = global.GVA_DB.Create(&newUser).Error
+		if err != nil {
+			return
+		}
+		m.TokenNext(c, newUser)
+	} else {
+		// 查询用户
+		m.TokenNext(c, user)
+	}
+
+	// response.OkWithDetailed(gin.H{"user": info}, "查询成功", c)
+}
+
+// 登录以后签发jwt
+func (m *MyApi) TokenNext(c *gin.Context, user system.SysUser) {
+	j := &utils.JWT{SigningKey: []byte(global.GVA_CONFIG.JWT.SigningKey)} // 唯一签名
+	claims := j.CreateClaims(utils.BaseClaims{
+		UUID:        user.UUID,
+		ID:          user.ID,
+		NickName:    user.NickName,
+		Username:    user.Username,
+		AuthorityId: user.AuthorityId,
+	})
+	token, err := j.CreateToken(claims)
+	if err != nil {
+		global.GVA_LOG.Error("获取token失败!", zap.Error(err))
+		response.FailWithMessage("获取token失败", c)
+		return
+	}
+	if !global.GVA_CONFIG.System.UseMultipoint {
+		response.OkWithDetailed(systemRes.LoginResponse{
+			User:      user,
+			Token:     token,
+			ExpiresAt: claims.StandardClaims.ExpiresAt * 1000,
+		}, "登录成功", c)
+	}
 }

@@ -50,6 +50,12 @@ func (s *MyApi) InitMyApiRouter(Router *gin.RouterGroup) {
 		MyRouterWithoutRecord.GET("cat", CmsCatApi.GetCmsCat)
 		MyRouterWithoutRecord.POST("cattest", CmsCatApi.CatTest) // 获取所有api
 		MyRouterWithoutRecord.POST("", CmsCatApi.CreateCmsCat)
+
+		MyRouterWithoutRecord.GET("user", api.GetUser)
+		MyRouterWithoutRecord.POST("user", api.CreateUser)
+
+		//登录
+		MyRouterWithoutRecord.POST("wxlogin", api.WxLogin)
 		// MyRouterWithoutRecord.GET("findTestStrutc", testStrutcApi.FindTestStrutc)       // 根据ID获取TestStrutc
 		// MyRouterWithoutRecord.GET("getTestStrutcList", testStrutcApi.GetTestStrutcList) // 获取TestStrutc列表
 	}

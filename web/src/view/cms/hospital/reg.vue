@@ -35,7 +35,9 @@
             <el-table ref="multipleTable" style="width: 100%" tooltip-effect="dark" :data="tableData" row-key="ID"
                 @selection-change="handleSelectionChange">
                 <el-table-column type="selection" width="55" />
-                
+                <el-table-column align="left" label="日期" width="180">
+                    <template #default="scope">{{ formatDate(scope.row.CreatedAt) }}</template>
+                </el-table-column>
                 <el-table-column align="left" label="患者姓名" prop="name" width="200" />
                 <el-table-column align="left" label="手机号" prop="phone" width="120" />
                 <el-table-column align="left" label="就诊时间" prop="time" width="200" />
@@ -62,9 +64,7 @@
                         </span>
                     </template>
                 </el-table-column>
-                <el-table-column align="left" label="日期" width="180">
-                        <template #default="scope">{{ formatDate(scope.row.CreatedAt) }}</template>
-                    </el-table-column>
+
                 <el-table-column align="left" label="按钮组" width="200">
                     <template #default="scope">
                         <el-button type="primary" link icon="edit" size="small" class="table-button"

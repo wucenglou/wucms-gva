@@ -156,6 +156,9 @@ timer:
         - tableName: jwt_blacklists
           compareField: created_at
           interval: 168h
+wx:
+    appId: wxd178a3abd041537c
+    appSecret: 3ba16f2f82174472c92fbe32e4868d43
 zap:
     level: info
     prefix: '[wucms-gva]'

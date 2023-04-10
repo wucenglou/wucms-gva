@@ -10,7 +10,6 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"go.uber.org/zap"
-	"gorm.io/gorm"
 	"gorm.io/gorm/clause"
 )
 
@@ -156,7 +155,8 @@ func (post *Post) UpdatePost(c *gin.Context) {
 		response.FailWithMessage(err.Error(), c)
 		return
 	}
-	err = global.GVA_DB.Session(&gorm.Session{FullSaveAssociations: true}).Save(&reqPost.Post).Error
+	// Session(&gorm.Session{FullSaveAssociations: true}).
+	err = global.GVA_DB.Save(&reqPost.Post).Error
 	if err != nil {
 		response.FailWithMessage(err.Error(), c)
 		return

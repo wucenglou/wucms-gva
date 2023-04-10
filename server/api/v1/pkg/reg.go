@@ -11,7 +11,6 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"go.uber.org/zap"
-	"gorm.io/gorm"
 )
 
 type Reg struct{}
@@ -74,7 +73,7 @@ func (r *Reg) UpdateReg(c *gin.Context) {
 		response.FailWithMessage(err.Error(), c)
 		return
 	}
-	err = global.GVA_DB.Session(&gorm.Session{FullSaveAssociations: true}).Save(&Reg).Error
+	err = global.GVA_DB.Save(&Reg).Error
 	if err != nil {
 		response.FailWithMessage(err.Error(), c)
 		return
