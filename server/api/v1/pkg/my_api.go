@@ -175,6 +175,44 @@ func (m *MyApi) DeletePatient(c *gin.Context) {
 	response.OkWithMessage("更新成功", c)
 }
 
+func (m *MyApi) GetPatientList(c *gin.Context) {
+	var pageInfo pkg.PatientSearch
+	err := c.ShouldBindQuery(&pageInfo)
+	if err != nil {
+		response.FailWithMessage(err.Error(), c)
+		return
+	}
+	limit := pageInfo.PageSize
+	offset := pageInfo.PageSize * (pageInfo.Page - 1)
+	user, _ := utils.GetUser(c)
+	// 创建db
+	db := global.GVA_DB.Model(&pkg.Patient{}).Where("user_id = ?", user.ID)
+	var Patients []pkg.Patient
+	var total int64
+	if len(pageInfo.Keyword) > 0 {
+		db = db.Where("name like ?", "%"+pageInfo.Keyword+"%")
+	}
+	err = db.Count(&total).Error
+	if err != nil {
+		return
+	}
+	err = db.Limit(limit).Offset(offset).Order("updated_at desc").Preload("User").Find(&Patients).Error
+
+	// err = global.GVA_DB.Preload("User").Preload("TermTaxonomy.Term").Find(&Patients).Error
+
+	if err != nil {
+		response.FailWithMessage(err.Error(), c)
+		return
+	}
+	response.OkWithDetailed(response.PageResult{
+		List:     Patients,
+		Total:    total,
+		Page:     pageInfo.Page,
+		PageSize: pageInfo.PageSize,
+	}, "获取成功", c)
+	// response.OkWithDetailed(gin.H{"list": Patients}, "查询成功", c)
+}
+
 func (m *MyApi) GetRegList(c *gin.Context) {
 	var pageInfo pkg.RegSearch
 	err := c.ShouldBindQuery(&pageInfo)
