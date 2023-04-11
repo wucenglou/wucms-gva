@@ -8,6 +8,7 @@
 /server/log/
 /server/gva
 /server/latest_log
+/server/config.taml
 
 /server/*.exe
 /server/*.exe~
