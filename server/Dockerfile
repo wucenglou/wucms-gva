@@ -19,6 +19,7 @@ WORKDIR /go/src/github.com/wucenglou/wucms-gva/server
 COPY --from=0 /go/src/github.com/wucenglou/wucms-gva/server/server ./
 COPY --from=0 /go/src/github.com/wucenglou/wucms-gva/server/resource ./resource/
 COPY --from=0 /go/src/github.com/wucenglou/wucms-gva/server/config.docker.yaml ./
+COPY --from=0 /go/src/github.com/wucenglou/wucms-gva/server/uploads ./uploads/
 
-EXPOSE 8888
+EXPOSE 8828
 ENTRYPOINT ./server -c config.docker.yaml
