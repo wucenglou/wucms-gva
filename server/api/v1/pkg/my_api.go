@@ -154,7 +154,11 @@ func (m *MyApi) DeletePatient(c *gin.Context) {
 		response.FailWithMessage(err.Error(), c)
 		return
 	}
-	user, _ := utils.GetUser(c)
+	user, err := utils.GetUser(c)
+	if err != nil {
+		response.FailWithMessage("用户不存在", c)
+		return
+	}
 	var Patient pkg.Patient
 	db := global.GVA_DB.Where("id = ?", request.ID)
 	err = db.Find(&Patient).Error
@@ -184,7 +188,15 @@ func (m *MyApi) GetPatientList(c *gin.Context) {
 	}
 	limit := pageInfo.PageSize
 	offset := pageInfo.PageSize * (pageInfo.Page - 1)
-	user, _ := utils.GetUser(c)
+	user, err := utils.GetUser(c)
+	if err != nil {
+		response.FailWithMessage("请先登录", c)
+		return
+	}
+	// if errors.Is(err, gorm.ErrRecordNotFound) {
+	// 	response.FailWithMessage("用户不存在", c)
+	// 	return
+	// }
 	// 创建db
 	db := global.GVA_DB.Model(&pkg.Patient{}).Where("user_id = ?", user.ID)
 	var Patients []pkg.Patient
@@ -220,7 +232,11 @@ func (m *MyApi) GetRegList(c *gin.Context) {
 		response.FailWithMessage(err.Error(), c)
 		return
 	}
-	user, _ := utils.GetUser(c)
+	user, err := utils.GetUser(c)
+	if err != nil {
+		response.FailWithMessage("用户不存在", c)
+		return
+	}
 	limit := pageInfo.PageSize
 	offset := pageInfo.PageSize * (pageInfo.Page - 1)
 	// 创建db
@@ -291,9 +307,17 @@ func (m *MyApi) CreateReg(c *gin.Context) {
 func (m *MyApi) CreateUser(c *gin.Context) {}
 
 func (m *MyApi) GetUser(c *gin.Context) {
-	userInfo, _ := utils.GetUser(c)
+	userInfo, err := utils.GetUser(c)
+	if err != nil {
+		response.FailWithMessage("用户不存在", c)
+		return
+	}
 	var user system.SysUser
-	global.GVA_DB.First(&user, userInfo.ID)
+	err = global.GVA_DB.First(&user, userInfo.ID).Error
+	if errors.Is(err, gorm.ErrRecordNotFound) {
+		response.FailWithMessage("用户不存在", c)
+		return
+	}
 	response.OkWithDetailed(gin.H{"user": user}, "查询成功", c)
 }
 
@@ -364,4 +388,34 @@ func (m *MyApi) TokenNext(c *gin.Context, user system.SysUser) {
 			ExpiresAt: claims.StandardClaims.ExpiresAt * 1000,
 		}, "登录成功", c)
 	}
+}
+
+func (m *MyApi) SetUserInfo(c *gin.Context) {
+	var reqUser system.SysUser
+	var user system.SysUser
+	err := c.ShouldBindJSON(&reqUser)
+	if err != nil {
+		response.FailWithMessage(err.Error(), c)
+		return
+	}
+	userinfo, _ := utils.GetUser(c)
+	err = global.GVA_DB.Find(&user, userinfo.ID).Error
+	if err != nil {
+		response.FailWithMessage(err.Error(), c)
+		return
+	}
+	matched, _ := regexp.MatchString("^(13[0-9]|14[01456879]|15[0-35-9]|16[2567]|17[0-8]|18[0-9]|19[0-35-9])\\d{8}$", reqUser.Phone)
+	if !matched {
+		response.FailWithMessage("手机号码有误", c)
+		return
+	}
+	user.NickName = reqUser.NickName
+	user.Phone = reqUser.Phone
+	user.HeaderImg = reqUser.HeaderImg
+	err = global.GVA_DB.Save(&user).Error
+	if err != nil {
+		response.FailWithMessage(err.Error(), c)
+		return
+	}
+	response.OkWithDetailed(gin.H{}, "修改成功", c)
 }

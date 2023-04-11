@@ -54,8 +54,9 @@ func (s *MyApi) InitMyApiRouter(Router *gin.RouterGroup) {
 		MyRouterWithoutRecord.GET("user", api.GetUser)
 		MyRouterWithoutRecord.POST("user", api.CreateUser)
 
-		//登录
+		//登录,用户管理
 		MyRouterWithoutRecord.POST("wxlogin", api.WxLogin)
+		MyRouterWithoutRecord.PUT("setUserInfo", api.SetUserInfo)
 		// MyRouterWithoutRecord.GET("findTestStrutc", testStrutcApi.FindTestStrutc)       // 根据ID获取TestStrutc
 		// MyRouterWithoutRecord.GET("getTestStrutcList", testStrutcApi.GetTestStrutcList) // 获取TestStrutc列表
 	}

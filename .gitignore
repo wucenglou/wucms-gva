@@ -9,6 +9,7 @@
 /server/gva
 /server/latest_log
 /server/config.yaml
+/server/config.docker.yaml
 
 /server/*.exe
 /server/*.exe~
