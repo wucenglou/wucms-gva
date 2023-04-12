@@ -8,6 +8,7 @@ import (
 	"wucms-gva/server/model/common/request"
 	"wucms-gva/server/model/common/response"
 	"wucms-gva/server/model/pkg"
+	"wucms-gva/server/utils"
 
 	"github.com/gin-gonic/gin"
 	"go.uber.org/zap"
@@ -25,6 +26,11 @@ func (r *Reg) CreateReg(c *gin.Context) {
 	matched, _ := regexp.MatchString("^(13[0-9]|14[01456879]|15[0-35-9]|16[2567]|17[0-8]|18[0-9]|19[0-35-9])\\d{8}$", strconv.Itoa(Reg.Phone))
 	if !matched {
 		response.FailWithMessage("手机号码有误", c)
+		return
+	}
+	Reg.RegTime, err = utils.ParseAndFormatTime(Reg.Time)
+	if err != nil {
+		response.FailWithMessage(err.Error(), c)
 		return
 	}
 	err = global.GVA_DB.Create(&Reg).Error

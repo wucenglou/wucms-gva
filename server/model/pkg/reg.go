@@ -31,17 +31,18 @@ type PatientSearch struct {
 // Pkg 结构体
 type Reg struct {
 	global.GVA_MODEL
-	Name       string `json:"name" form:"name" gorm:"column:name;comment:;"`
-	Phone      int    `json:"phone" form:"phone" gorm:"column:phone;comment:;"`
-	Bz         string `json:"bz" form:"bz" gorm:"column:bz;comment:;"`
-	Gender     string `json:"gender" form:"gender" gorm:"column:gender;comment:;"`
-	From       string `json:"from" form:"from" gorm:"column:from;comment:;"`
-	Time       string `json:"time" form:"time" gorm:"column:time;comment:;"`
-	Desc       string `json:"desc" form:"desc" gorm:"type:longtext;column:desc;comment:;"`
-	GptSuggest string `json:"gpt_suggest" form:"gpt_suggest" gorm:"type:longtext;column:gpt_suggest;comment:;"`
-	Ip         string `json:"ip" form:"ip" gorm:"column:ip;comment:;"`
-	IpDesc     string `json:"ipDesc" form:"ipDesc" gorm:"column:ipDesc;comment:;"`
-	DoctorName string `json:"doctor_name" form:"doctor_name" gorm:"column:doctor_name;comment:;"`
+	Name       string    `json:"name" form:"name" gorm:"column:name;comment:;"`
+	Phone      int       `json:"phone" form:"phone" gorm:"column:phone;comment:;"`
+	Bz         string    `json:"bz" form:"bz" gorm:"column:bz;comment:;"`
+	Gender     string    `json:"gender" form:"gender" gorm:"column:gender;comment:;"`
+	From       string    `json:"from" form:"from" gorm:"column:from;comment:;"`
+	Time       string    `json:"time" form:"time" gorm:"column:time;comment:;"`
+	RegTime    time.Time `json:"reg_time" form:"reg_time" gorm:"column:reg_time;comment:;"`
+	Desc       string    `json:"desc" form:"desc" gorm:"type:longtext;column:desc;comment:;"`
+	GptSuggest string    `json:"gpt_suggest" form:"gpt_suggest" gorm:"type:longtext;column:gpt_suggest;comment:;"`
+	Ip         string    `json:"ip" form:"ip" gorm:"column:ip;comment:;"`
+	IpDesc     string    `json:"ipDesc" form:"ipDesc" gorm:"column:ipDesc;comment:;"`
+	DoctorName string    `json:"doctor_name" form:"doctor_name" gorm:"column:doctor_name;comment:;"`
 
 	Status string `json:"status" form:"status" gorm:"size:20;index:status;column:status;comment:;default:'PendingClinic';comment:PendingClinic待就诊PendingPay待付款ClinicOver就诊完成ClinicCancel取消挂号"`
 

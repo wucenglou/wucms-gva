@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"regexp"
 	"strconv"
+	"time"
 	"wucms-gva/server/global"
 	"wucms-gva/server/model/common/request"
 	"wucms-gva/server/model/common/response"
@@ -23,6 +24,35 @@ import (
 )
 
 type MyApi struct{}
+
+func (m *MyApi) GetCmsInfo(c *gin.Context) {
+	// var user []system.SysUser
+	// dbUser := global.GVA_DB.Model(&system.SysUser{})
+	// 统计用户总数
+	dbUser := global.GVA_DB.Model(&system.SysUser{})
+	var totalCount int64
+	dbUser.Count(&totalCount)
+	// 统计今天新增的用户
+	today := time.Now().Truncate(24 * time.Hour)
+	tomorrow := today.Add(24 * time.Hour)
+	yesterday := today.Add(-24 * time.Hour)
+	var todayCount int64
+	dbUser.Where("created_at >= ? AND created_at < ?", today, tomorrow).Count(&todayCount)
+	// 统计昨天新增的用户
+	var yesterdayCount int64
+	dbUser.Where("created_at >= ? AND created_at < ?", yesterday, today).Count(&yesterdayCount)
+
+	dbReg := global.GVA_DB.Model(&pkg.Reg{})
+	var totalCountReg int64
+	dbReg.Count(&totalCountReg)
+	var todayCountReg int64
+	dbReg.Where("created_at >= ? AND created_at < ?", today, tomorrow).Count(&todayCountReg)
+	var yesterdayCountReg int64
+	dbReg.Where("created_at >= ? AND created_at < ?", yesterday, today).Count(&yesterdayCountReg)
+
+	response.OkWithData(gin.H{"UserInfo": gin.H{"todayCount": todayCount, "yesterdayCount": yesterdayCount, "totalCount": totalCount}, "RegInfo": gin.H{"todayCountReg": todayCountReg, "yesterdayCountReg": yesterdayCountReg, "totalCountReg": totalCountReg}}, c)
+
+}
 
 func (m *MyApi) GetPostList(c *gin.Context) {
 	var pageInfo request.ModelPageInfo
@@ -279,15 +309,20 @@ func (m *MyApi) CreateReg(c *gin.Context) {
 		response.FailWithMessage("手机号码有误", c)
 		return
 	}
+	Reg.RegTime, err = utils.ParseAndFormatTime(Reg.Time)
+	if err != nil {
+		response.FailWithMessage(err.Error(), c)
+		return
+	}
 	user, _ := utils.GetUser(c)
 	ip := c.ClientIP()
-	ipInfo, _ := utils.GetIpInfo("113.121.36.199")
+	ipInfo, _ := utils.GetIpInfo(ip)
 	fmt.Println(ipInfo)
 	Reg.UserId = user.ID
 	Reg.Ip = ip
 	Reg.IpDesc = ipInfo
 	var tmp pkg.Reg
-	err = global.GVA_DB.Where("user_id = ?", user.ID).Where("time = ?", Reg.Time).First(&tmp).Error
+	err = global.GVA_DB.Where("user_id = ?", user.ID).Where("time = ?", Reg.Time).Where("phone = ?", Reg.Phone).First(&tmp).Error
 	// if err != nil {
 	// 	response.FailWithMessage(err.Error(), c)
 	// 	return

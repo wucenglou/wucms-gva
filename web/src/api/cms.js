@@ -48,3 +48,11 @@ export const getCmsCatList = (params) => {
         params
     })
 }
+
+export const getCmsInfo = (params) => {
+    return service({
+        url: '/myapi/cmsInfo',
+        method: 'get',
+        params
+    })
+}

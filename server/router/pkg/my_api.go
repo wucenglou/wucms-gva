@@ -21,12 +21,13 @@ func (s *MyApi) InitMyApiRouter(Router *gin.RouterGroup) {
 	CmsCatApi := v1.ApiGroupApp.SystemApiGroup.CmsCatApi
 	var api = v1.ApiGroupApp.PkgApiGroup.MyApi
 	{
-
 		// MyRouter.DELETE("deleteTestStrutc", testStrutcApi.DeleteTestStrutc)           // 删除TestStrutc
 		// MyRouter.DELETE("deleteTestStrutcByIds", testStrutcApi.DeleteTestStrutcByIds) // 批量删除TestStrutc
 		// MyRouter.PUT("updateTestStrutc", testStrutcApi.UpdateTestStrutc)              // 更新TestStrutc
 	}
 	{
+
+		MyRouterWithoutRecord.GET("cmsInfo", api.GetCmsInfo)
 
 		MyRouterWithoutRecord.DELETE("deletePatient", api.DeletePatient)
 		MyRouterWithoutRecord.PUT("updatePatient", patientApi.UpdatePatient)
