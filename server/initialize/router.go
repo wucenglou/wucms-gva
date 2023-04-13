@@ -61,6 +61,14 @@ func Routers() *gin.Engine {
 	PrivateGroup := Router.Group("")
 	PrivateGroup.Use(middleware.JWTAuth())
 	{
+		systemRouter.InitCmsCatRouter(PrivateGroup)
+		pkgRouter.InitPostRouter(PrivateGroup)
+		pkgRouter.InitDoctorRouter(PrivateGroup)
+		pkgRouter.InitRegRouter(PrivateGroup)
+		pkgRouter.InitPatientRouter(PrivateGroup)
+	}
+	PrivateGroup.Use(middleware.JWTAuth()).Use(middleware.CasbinHandler())
+	{
 		systemRouter.InitApiRouter(PrivateGroup)                 // 注册功能api路由
 		systemRouter.InitJwtRouter(PrivateGroup)                 // jwt相关路由
 		systemRouter.InitUserRouter(PrivateGroup)                // 注册用户路由
@@ -75,13 +83,13 @@ func Routers() *gin.Engine {
 		systemRouter.InitSysDictionaryDetailRouter(PrivateGroup) // 字典详情管理
 		systemRouter.InitAuthorityBtnRouterRouter(PrivateGroup)  // 字典详情管理
 
-		systemRouter.InitCmsCatRouter(PrivateGroup)
+		// systemRouter.InitCmsCatRouter(PrivateGroup)
 
-		pkgRouter.InitPostRouter(PrivateGroup)
+		// pkgRouter.InitPostRouter(PrivateGroup)
 
-		pkgRouter.InitDoctorRouter(PrivateGroup)
-		pkgRouter.InitRegRouter(PrivateGroup)
-		pkgRouter.InitPatientRouter(PrivateGroup)
+		// pkgRouter.InitDoctorRouter(PrivateGroup)
+		// pkgRouter.InitRegRouter(PrivateGroup)
+		// pkgRouter.InitPatientRouter(PrivateGroup)
 
 		exampleRouter.InitFileUploadAndDownloadRouter(PrivateGroup) // 文件上传下载功能路由
 	}
