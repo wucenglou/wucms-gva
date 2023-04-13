@@ -49,8 +49,8 @@ type Reg struct {
 	UserId uint           `json:"user_id" form:"user_id" gorm:"foreignKey:ID;index:user_id;column:user_id;"`
 	User   system.SysUser `gorm:"foreignKey:UserId;"`
 
-	DoctorId *int           `json:"doctor_id" form:"doctor_id" gorm:"foreignKey:ID;index:doctor_id;column:doctor_id;"`
-	Doctor   system.SysUser `gorm:"foreignKey:DoctorId;"`
+	DoctorId *int   `json:"doctor_id" form:"doctor_id" gorm:"foreignKey:ID;index:doctor_id;column:doctor_id;"`
+	Doctor   Doctor `gorm:"foreignKey:DoctorId;"`
 }
 
 type Doctor struct {
