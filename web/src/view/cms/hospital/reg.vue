@@ -44,6 +44,7 @@
                 <el-table-column align="left" label="病种" prop="bz" width="100" />
                 <el-table-column align="left" label="描述" prop="desc" show-overflow-tooltip width="200" />
                 <el-table-column align="left" label="IP位置(供参考)" prop="ipDesc" width="200" />
+                <el-table-column align="left" label="指定的挂号医生" prop="Doctor.name" show-overflow-tooltip width="200" />
                 <el-table-column align="left" label="账户用户名" prop="User.userName" show-overflow-tooltip width="200" />
                 <el-table-column align="left" label="挂号状态" prop="status" width="120">
                     <template #default="scope">
