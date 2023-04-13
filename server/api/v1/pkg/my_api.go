@@ -314,9 +314,17 @@ func (m *MyApi) CreateReg(c *gin.Context) {
 		response.FailWithMessage(err.Error(), c)
 		return
 	}
-	user, _ := utils.GetUser(c)
+	user, err := utils.GetUser(c)
+	if err != nil {
+		response.FailWithMessage(err.Error(), c)
+		return
+	}
 	ip := c.ClientIP()
-	ipInfo, _ := utils.GetIpInfo(ip)
+	ipInfo, err := utils.GetIpInfo(ip)
+	if err != nil {
+		response.FailWithMessage(err.Error(), c)
+		return
+	}
 	fmt.Println(ipInfo)
 	Reg.UserId = user.ID
 	Reg.Ip = ip

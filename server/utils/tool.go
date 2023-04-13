@@ -9,7 +9,7 @@ import (
 )
 
 func GetIpInfo(ip string) (ipInfo string, err error) {
-	searcher, err := xdb.NewWithFileOnly("utils/ip.xdb")
+	searcher, err := xdb.NewWithFileOnly("resource/ip.xdb")
 	if err != nil {
 		fmt.Printf("failed to create searcher: %s\n", err.Error())
 		return "", err
