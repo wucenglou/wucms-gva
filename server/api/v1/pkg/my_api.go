@@ -375,7 +375,8 @@ func (m *MyApi) WxLogin(c *gin.Context) {
 		response.FailWithMessage(err.Error(), c)
 		return
 	}
-	resp, _ := http.Get("https://api.weixin.qq.com/sns/jscode2session?appid=wxd178a3abd041537c&secret=3ba16f2f82174472c92fbe32e4868d43&js_code=" + wxcode.Code + "&grant_type=authorization_code")
+	wx := global.GVA_CONFIG.Wx
+	resp, _ := http.Get("https://api.weixin.qq.com/sns/jscode2session?appid=" + wx.AppID + "&secret=" + wx.AppSecret + "&js_code=" + wxcode.Code + "&grant_type=authorization_code")
 	closer := resp.Body
 	bytes, _ := ioutil.ReadAll(closer)
 	info := make(map[string]interface{})
