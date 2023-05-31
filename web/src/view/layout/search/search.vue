@@ -55,16 +55,8 @@ const changeRouter = (e) => {
         params[res.key] = res.value
       }
     })
-    router.push({ name: e.value, params: params,query: query})
+    router.push({ name: e.value, params: params, query: query })
   }
-  // try {
-  //   router.push({ name: e.value })
-  // } catch (err) {
-  //   console.log()
-
-  //   console.log("不支持")
-  // }
-
 }
 
 const show = ref(false)

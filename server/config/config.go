@@ -27,6 +27,7 @@ type Server struct {
 	Timer Timer `mapstructure:"timer" json:"timer" yaml:"timer"`
 
 	// 跨域配置
-	Cors CORS `mapstructure:"cors" json:"cors" yaml:"cors"`
-	Wx   Wx   `mapstructure:"wx" json:"wx" yaml:"wx"`
+	Cors  CORS  `mapstructure:"cors" json:"cors" yaml:"cors"`
+	Wx    Wx    `mapstructure:"wx" json:"wx" yaml:"wx"`
+	Wxpay Wxpay `mapstructure:"wxpay" json:"wxpay" yaml:"wxpay"`
 }

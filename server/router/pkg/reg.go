@@ -16,6 +16,8 @@ func (s *RegRouter) InitRegRouter(Router *gin.RouterGroup) {
 	pkgRouterWithoutRecord := Router.Group("reg")
 	var RegApi = v1.ApiGroupApp.PkgApiGroup.Reg
 	{
+		pkgRouter.GET("CreateRedis", RegApi.CreateRedis)
+		pkgRouter.GET("createEx", RegApi.CreateEx)
 		pkgRouter.POST("createReg", RegApi.CreateReg)             // 新建Pkg
 		pkgRouter.DELETE("deleteReg", RegApi.DeleteReg)           // 删除Pkg
 		pkgRouter.DELETE("deleteRegByIds", RegApi.DeleteRegByIds) // 批量删除Pkg
