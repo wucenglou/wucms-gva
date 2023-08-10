@@ -18,15 +18,17 @@ type AuthorityMenuApi struct{}
 func (a *AuthorityMenuApi) GetMenu(c *gin.Context) {
 	print("---------getMenu------------")
 	print(utils.GetUserAuthorityId(c))
-	if menus, err := menuService.GetMenuTree(utils.GetUserAuthorityId(c)); err != nil {
+	menus, err := menuService.GetMenuTree(utils.GetUserAuthorityId(c))
+	if err != nil {
 		global.GVA_LOG.Error("获取失败!", zap.Error(err))
 		response.FailWithMessage("获取失败", c)
-	} else {
-		if menus == nil {
-			menus = []system.SysMenu{}
-		}
-		response.OkWithDetailed(systemRes.SysMenusResponse{Menus: menus}, "获取成功", c)
+		return
 	}
+	if menus == nil {
+		menus = []system.SysMenu{}
+	}
+	response.OkWithDetailed(systemRes.SysMenusResponse{Menus: menus}, "获取成功", c)
+
 }
 
 // GetBaseMenuTree

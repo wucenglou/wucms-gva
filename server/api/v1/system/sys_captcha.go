@@ -11,11 +11,11 @@ import (
 	"go.uber.org/zap"
 )
 
-type BaseApi struct{}
-
 // 当开启多服务器部署时，替换下面的配置，使用redis共享存储验证码
 // var store = captcha.NewDefaultRedisStore()
 var store = base64Captcha.DefaultMemStore
+
+type BaseApi struct{}
 
 // Captcha
 // @Tags      Base

@@ -13,13 +13,9 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"go.uber.org/zap"
-	"golang.org/x/text/cases"
-	"golang.org/x/text/language"
 )
 
 type AutoCodeApi struct{}
-
-var caser = cases.Title(language.English)
 
 // PreviewTemp
 // @Tags      AutoCode
@@ -38,7 +34,7 @@ func (autoApi *AutoCodeApi) PreviewTemp(c *gin.Context) {
 		return
 	}
 	a.Pretreatment() // 处理go关键字
-	a.PackageT = caser.String(a.Package)
+	a.PackageT = utils.FirstUpper(a.Package)
 	autoCode, err := autoCodeService.PreviewTemp(a)
 	if err != nil {
 		global.GVA_LOG.Error("预览失败!", zap.Error(err))
@@ -76,7 +72,7 @@ func (autoApi *AutoCodeApi) CreateTemp(c *gin.Context) {
 			apiIds = ids
 		}
 	}
-	a.PackageT = caser.String(a.Package)
+	a.PackageT = utils.FirstUpper(a.Package)
 	err := autoCodeService.CreateTemp(a, apiIds...)
 	if err != nil {
 		if errors.Is(err, system.ErrAutoMove) {
@@ -294,4 +290,25 @@ func (autoApi *AutoCodeApi) InstallPlugin(c *gin.Context) {
 			"code": server,
 			"msg":  serverStr,
 		}}, c)
+}
+
+// PubPlug
+// @Tags      AutoCode
+// @Summary   打包插件
+// @Security  ApiKeyAuth
+// @accept    application/json
+// @Produce   application/json
+// @Param     data  body      system.SysAutoCode                                         true  "打包插件"
+// @Success   200   {object}  response.Response{data=map[string]interface{},msg=string}  "打包插件成功"
+// @Router    /autoCode/pubPlug [get]
+func (autoApi *AutoCodeApi) PubPlug(c *gin.Context) {
+	plugName := c.Query("plugName")
+	snake := strings.ToLower(plugName)
+	zipPath, err := autoCodeService.PubPlug(snake)
+	if err != nil {
+		global.GVA_LOG.Error("打包失败！", zap.Error(err))
+		response.FailWithMessage("打包失败"+err.Error(), c)
+		return
+	}
+	response.OkWithMessage(fmt.Sprintf("打包成功，文件路径为：%s", zipPath), c)
 }

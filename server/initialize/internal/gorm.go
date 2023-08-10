@@ -8,7 +8,12 @@ import (
 
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
+	"gorm.io/gorm/schema"
 )
+
+type DBBASE interface {
+	GetLogMode() string
+}
 
 var Gorm = new(_gorm)
 
@@ -16,14 +21,30 @@ type _gorm struct{}
 
 // Config gorm 自定义配置
 // Author [SliverHorn](https://github.com/SliverHorn)
-func (g *_gorm) Config() *gorm.Config {
-	config := &gorm.Config{DisableForeignKeyConstraintWhenMigrating: true}
-	_default := logger.New(NewWriter(log.New(os.Stdout, "\r\n", log.LstdFlags)), logger.Config{
+func (g *_gorm) Config(prefix string, singular bool) *gorm.Config {
+	config := &gorm.Config{
+		NamingStrategy: schema.NamingStrategy{
+			TablePrefix:   prefix,
+			SingularTable: singular,
+		},
+		DisableForeignKeyConstraintWhenMigrating: true,
+	}
+	_default := logger.New(log.New(os.Stdout, "\r\n", log.LstdFlags), logger.Config{
 		SlowThreshold: 200 * time.Millisecond,
 		LogLevel:      logger.Warn,
 		Colorful:      true,
 	})
-	switch global.GVA_CONFIG.Mysql.LogMode {
+	var logMode DBBASE
+	switch global.GVA_CONFIG.System.DbType {
+	case "mysql":
+		logMode = &global.GVA_CONFIG.Mysql
+	case "pgsql":
+		logMode = &global.GVA_CONFIG.Pgsql
+	default:
+		logMode = &global.GVA_CONFIG.Mysql
+	}
+
+	switch logMode.GetLogMode() {
 	case "silent", "Silent":
 		config.Logger = _default.LogMode(logger.Silent)
 	case "error", "Error":

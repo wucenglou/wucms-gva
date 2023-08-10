@@ -22,7 +22,7 @@ func GormMysql() *gorm.DB {
 		DefaultStringSize:         191,     // string 类型字段的默认长度
 		SkipInitializeWithVersion: false,   // 根据版本自动配置
 	}
-	if db, err := gorm.Open(mysql.New(mysqlConfig), internal.Gorm.Config()); err != nil {
+	if db, err := gorm.Open(mysql.New(mysqlConfig), internal.Gorm.Config(m.Prefix, m.Singular)); err != nil {
 		return nil
 	} else {
 		sqlDB, _ := db.DB()
@@ -42,7 +42,7 @@ func GormMysqlByConfig(m config.Mysql) *gorm.DB {
 		DefaultStringSize:         191,     // string 类型字段的默认长度
 		SkipInitializeWithVersion: false,   // 根据版本自动配置
 	}
-	if db, err := gorm.Open(mysql.New(mysqlConfig), internal.Gorm.Config()); err != nil {
+	if db, err := gorm.Open(mysql.New(mysqlConfig), internal.Gorm.Config(m.Prefix, m.Singular)); err != nil {
 		panic(err)
 	} else {
 		sqlDB, _ := db.DB()
