@@ -26,7 +26,8 @@ func Gorm() *gorm.DB {
 
 // RegisterTables 注册数据库表专用
 // Author SliverHorn
-func RegisterTables(db *gorm.DB) {
+func RegisterTables() {
+	db := global.GVA_DB
 	err := db.AutoMigrate(
 		// 系统模块表
 		system.SysApi{},
