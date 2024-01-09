@@ -64,7 +64,7 @@ func (t *timer) AddTaskByFunc(cronName string, spec string, fun func(), taskName
 		}
 	}
 	id, err := t.cronList[cronName].corn.AddFunc(spec, fun)
-	t.cronList[taskName].corn.Start()
+	t.cronList[cronName].corn.Start()
 	t.cronList[cronName].tasks[id] = &task{
 		EntryID:  id,
 		Spec:     spec,
